@@ -7,7 +7,7 @@
 class Token
 {
 public:
-    Token(TokenType type, std::string lexeme, Object literal, int line)
+    Token(TokenType type, std::string lexeme, void *literal, int line)
         : type(type), lexeme(lexeme), literal(literal), line(line)
     {
         // 构造函数体为空，因为成员变量已经在初始化列表中初始化
@@ -20,7 +20,7 @@ public:
 private:
     const TokenType type;
     const std::string lexeme;
-    const Object literal;
+    const void *literal;
     const int line;
 }
 #endif // TOKEN_H

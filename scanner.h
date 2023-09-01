@@ -23,7 +23,6 @@ public:
             ScanToken();
         }
 
-        tokens.add(new Token(EOF, "", null, line));
         return tokens;
     }
 
@@ -42,16 +41,17 @@ private:
     char advance() // 读取下一个字符
     {
         current++;
-        return source.charAt(current - 1);
+        return source[current - 1];
     }
     void addToken(TokenType type) // 添加词法单元
     {
-        addToken(type, null);
+        addToken(type, nullptr);
     }
-    void addToken(TokenType type, Object literal) // 添加词法单元
+    void addToken(TokenType type, void *literal) // 添加词法单元
     {
-        std::string text = source.substring(start, current); // 从源代码中截取出当前词法单元的字符串
-        tokens.add(new Token(type, text, literal, line));    // 将当前词法单元添加到词法单元列表中
+        // std::string text = source.substring(start, current); // 从源代码中截取出当前词法单元的字符串
+        std::string text = source.substr(start, current - start); // 从源代码中截取出当前词法单元的字符串
+        tokens.push_back(Token(type, text, literal, line));       // 将当前词法单元添加到词法单元列表中
     }
     void ScanToken() // 词法分析
     {
