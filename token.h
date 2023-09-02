@@ -19,9 +19,9 @@ public:
     }
 
 private:
-    const TokenType type;
-    const std::string lexeme;
-    const std::any literal; // 词法单元的字面量
-    const int line;
+    const TokenType type;     // 词法单元的类型
+    const std::string lexeme; // 词法单元的字符串
+    const std::any literal;   // 词法单元的字面量
+    const int line;           // 词法单元所在的行号
 };
 #endif // TOKEN_H
