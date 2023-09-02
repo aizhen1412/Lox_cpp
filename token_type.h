@@ -51,7 +51,7 @@ enum TokenType
 
     END_OF_FILE
 };
-std::string TokenTypeTOString(TokenType TokenType)
+std::string TokenType2String(TokenType TokenType)
 {
     switch (TokenType)
     {

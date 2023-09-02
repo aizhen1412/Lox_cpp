@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <any>
 #include "token.h"
 #include "token_type.h"
 
@@ -48,7 +47,7 @@ private:
     {
         addToken(type, nullptr);
     }
-    void addToken(TokenType type, std::any literal) // 添加词法单元
+    void addToken(TokenType type, std::variant<double, std::string, std::nullptr_t> literal) // 添加词法单元
     {
         // std::string text = source.substring(start, current); // 从源代码中截取出当前词法单元的字符串
         std::string text = source.substr(start, current - start); // 从源代码中截取出当前词法单元的字符串
