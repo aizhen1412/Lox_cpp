@@ -38,16 +38,16 @@ private:
         return current >= source.length();
     }
 
-    char advance() // 读取下一个字符
+    char Advance() // 读取下一个字符
     {
         current++;
         return source[current - 1];
     }
-    void addToken(TokenType type) // 添加词法单元
+    void AddToken(TokenType type) // 添加词法单元
     {
-        addToken(type, nullptr);
+        AddToken(type, nullptr);
     }
-    void addToken(TokenType type, std::variant<double, std::string, std::nullptr_t> literal) // 添加词法单元
+    void AddToken(TokenType type, std::variant<double, std::string, std::nullptr_t> literal) // 添加词法单元
     {
         // std::string text = source.substring(start, current); // 从源代码中截取出当前词法单元的字符串
         std::string text = source.substr(start, current - start); // 从源代码中截取出当前词法单元的字符串
@@ -55,61 +55,61 @@ private:
     }
     void ScanToken() // 词法分析
     {
-        char c = advance();
+        char c = Advance();
         switch (c)
         {
         case '(':
-            addToken(LEFT_PAREN);
+            AddToken(LEFT_PAREN);
             break;
         case ')':
-            addToken(RIGHT_PAREN);
+            AddToken(RIGHT_PAREN);
             break;
         case '{':
-            addToken(LEFT_BRACE);
+            AddToken(LEFT_BRACE);
             break;
         case '}':
-            addToken(RIGHT_BRACE);
+            AddToken(RIGHT_BRACE);
             break;
         case ',':
-            addToken(COMMA);
+            AddToken(COMMA);
             break;
         case '.':
-            addToken(DOT);
+            AddToken(DOT);
             break;
         case '-':
-            addToken(MINUS);
+            AddToken(MINUS);
             break;
         case '+':
-            addToken(PLUS);
+            AddToken(PLUS);
             break;
         case ';':
-            addToken(SEMICOLON);
+            AddToken(SEMICOLON);
             break;
         case '*':
-            addToken(STAR);
+            AddToken(STAR);
             break;
         case '!':
-            addToken(match('=') ? BANG_EQUAL : BANG);
+            AddToken(Match('=') ? BANG_EQUAL : BANG);
             break;
         case '=':
-            addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+            AddToken(Match('=') ? EQUAL_EQUAL : EQUAL);
             break;
         case '<':
-            addToken(match('=') ? LESS_EQUAL : LESS);
+            AddToken(Match('=') ? LESS_EQUAL : LESS);
             break;
         case '>':
-            addToken(match('=') ? GREATER_EQUAL : GREATER);
+            AddToken(Match('=') ? GREATER_EQUAL : GREATER);
             break;
         case '/':
-            if (match('/'))
+            if (Match('/'))
             {
 
-                while (peek() != '\n' && !IsAtEnd())
-                    advance();
+                while (Peek() != '\n' && !IsAtEnd())
+                    Advance();
             }
             else
             {
-                addToken(SLASH);
+                AddToken(SLASH);
             }
             break;
         case ' ':
@@ -122,16 +122,16 @@ private:
             line++;
             break;
         case '"':
-            string();
+            String();
             break;
         default:
-            if (isDigit(c))
+            if (IsDigit(c))
             {
-                number();
+                Number();
             }
-            else if (isAlpha(c))
+            else if (IsAlpha(c))
             {
-                identifier();
+                Identifier();
             }
             else
             {
@@ -141,10 +141,10 @@ private:
             break;
         }
     }
-    void identifier()
+    void Identifier()
     {
-        while (isAlphaNumeric(peek()))
-            advance();
+        while (IsAlphaNumeric(Peek()))
+            Advance();
 
         std::string text = source.substr(start, current); // 从源代码中截取出当前词法单元的字符串
         // keywords["default"] = TokenType::FAULT;
@@ -165,37 +165,37 @@ private:
             // 处理未找到的情况
         }
 
-        addToken(type);
+        AddToken(type);
     }
-    void number()
+    void Number()
     {
-        while (isDigit(peek()))
-            advance();
+        while (IsDigit(Peek()))
+            Advance();
 
         // Look for a fractional part.
-        if (peek() == '.' && isDigit(peekNext()))
+        if (Peek() == '.' && IsDigit(PeekNext()))
         {
             // Consume the "."
-            advance();
+            Advance();
 
-            while (isDigit(peek()))
-                advance();
+            while (IsDigit(Peek()))
+                Advance();
         }
 
-        addToken(NUMBER,
+        AddToken(NUMBER,
                  std::stod(source.substr(start, current)));
     }
-    bool isDigit(char c)
+    bool IsDigit(char c)
     {
         return c >= '0' && c <= '9';
     }
-    void string()
+    void String()
     {
-        while (peek() != '"' && !IsAtEnd())
+        while (Peek() != '"' && !IsAtEnd())
         {
-            if (peek() == '\n')
+            if (Peek() == '\n')
                 line++;
-            advance();
+            Advance();
         }
 
         if (IsAtEnd())
@@ -206,13 +206,13 @@ private:
         }
 
         // The closing ".
-        advance();
+        Advance();
 
         // Trim the surrounding quotes.
         std::string value = source.substr(start + 1, current - 1);
-        addToken(STRING, value);
+        AddToken(STRING, value);
     }
-    bool match(char expected)
+    bool Match(char expected)
     {
         if (IsAtEnd())
             return false;
@@ -223,27 +223,27 @@ private:
         return true;
     }
 
-    char peek()
+    char Peek()
     {
         if (IsAtEnd())
             return '\0';
         return source[current];
     }
-    char peekNext()
+    char PeekNext()
     {
         if (current + 1 >= source.length())
             return '\0';
         return source[current + 1];
     }
-    bool isAlpha(char c)
+    bool IsAlpha(char c)
     {
         return (c >= 'a' && c <= 'z') ||
                (c >= 'A' && c <= 'Z') ||
                c == '_';
     }
-    bool isAlphaNumeric(char c)
+    bool IsAlphaNumeric(char c)
     {
-        return isAlpha(c) || isDigit(c);
+        return IsAlpha(c) || IsDigit(c);
     }
     std::unordered_map<std::string, TokenType> keywords = {
         {"and", TokenType::AND},

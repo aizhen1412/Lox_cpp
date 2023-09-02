@@ -31,6 +31,7 @@ public:
         //     +std::any_cast<std::string>(literal);type +
     }
 
+private:
     const TokenType type;                                            // 词法单元的类型
     const std::string lexeme;                                        // 词法单元的字符串
     const std::variant<double, std::string, std::nullptr_t> literal; // 词法单元的字面量
