@@ -6,6 +6,7 @@
 
 int main(int argc, char *argv[])
 {
+    argc = 0; // test
     if (argc > 1)
     {
         std::cerr << "Usage: ./cpplox [script]" << std::endl;

@@ -16,7 +16,6 @@
         "ctime": "cpp",
         "cwchar": "cpp",
         "exception": "cpp",
-        "fstream": "cpp",
         "initializer_list": "cpp",
         "ios": "cpp",
         "iosfwd": "cpp",
@@ -24,10 +23,10 @@
         "istream": "cpp",
         "iterator": "cpp",
         "limits": "cpp",
+        "map": "cpp",
         "memory": "cpp",
         "new": "cpp",
         "ostream": "cpp",
-        "sstream": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "string": "cpp",
@@ -36,7 +35,6 @@
         "type_traits": "cpp",
         "typeinfo": "cpp",
         "utility": "cpp",
-        "vector": "cpp",
         "xfacet": "cpp",
         "xiosbase": "cpp",
         "xlocale": "cpp",
@@ -45,7 +43,14 @@
         "xmemory": "cpp",
         "xstddef": "cpp",
         "xtr1common": "cpp",
+        "xtree": "cpp",
         "xutility": "cpp",
-        "any": "cpp"
+        "fstream": "cpp",
+        "sstream": "cpp",
+        "vector": "cpp",
+        "any": "cpp",
+        "list": "cpp",
+        "unordered_map": "cpp",
+        "xhash": "cpp"
     }
 }

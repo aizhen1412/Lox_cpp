@@ -56,12 +56,12 @@ private:
     static void Run(const std::string &source)
     {
         Scanner scanner(source);
-        std::vector<Token> tokens = scanner.scanTokens();
+        std::vector<Token> tokens = scanner.ScanTokens();
 
         // For now, just print the tokens.
         for (const Token &token : tokens)
         {
-            std::cout << token << std::endl;
+            std::cout << token.ToString() << std::endl;
         }
     }
     static void Report(int line, std::string where, std::string message)
