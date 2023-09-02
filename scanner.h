@@ -29,9 +29,9 @@ public:
 private:
     const std::string source;  // 源代码
     std::vector<Token> tokens; // 词法单元列表
-    int start = 0;             // 记录当前词法单元的起始位置
-    int current = 0;           // 记录当前词法单元的结束位置
-    int line = 1;              // 记录当前词法单元所在的行号
+    unsigned start = 0;        // 记录当前词法单元的起始位置
+    unsigned current = 0;      // 记录当前词法单元的结束位置
+    unsigned line = 1;         // 记录当前词法单元所在的行号
 
     bool IsAtEnd() // 判断是否到达末尾
     {

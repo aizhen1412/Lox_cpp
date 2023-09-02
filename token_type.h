@@ -176,5 +176,4 @@ std::string TokenType2String(TokenType TokenType)
         break;
     }
 }
-
 #endif // clox_token_type_h

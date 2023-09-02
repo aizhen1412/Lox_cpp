@@ -16,7 +16,17 @@ public:
     }
     std::string ToString() const // 将词法单元转换为字符串
     {
-        std::cout << literal.index() << std::endl;
+        if (std::holds_alternative<double>(literal)) // 判断literal的类型
+        {
+            double literal_value = std::get<double>(literal);
+            std::cout << "Stored double: " << literal_value << std::endl;
+        }
+        else if (std::holds_alternative<std::string>(literal))
+        {
+            std::string literal_value = std::get<std::string>(literal);
+            std::cout << "Stored string: " << literal_value << std::endl;
+        }
+        // std::cout << literal.index() << std::endl;
         return TokenType2String(type) + " " + lexeme + " ";
         //     +std::any_cast<std::string>(literal);type +
     }
