@@ -12,14 +12,14 @@ int main(int argc, char *argv[])
         std::cerr << "Usage: ./cpplox [script]" << std::endl;
         return 64;
     }
-    else if (argc == 1)
+    else if (argc == 1) // 从文件中读取源代码
     {
         Lox::RunFile(argv[0]);
     }
-    else
+    else // 命令行
     {
         Lox::RunPrompt();
 
         return 0;
     }
-} // 4.5.1
+}

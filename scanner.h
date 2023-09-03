@@ -14,12 +14,12 @@ public:
     {
         // 构造函数体为空，因为成员变量已经在初始化列表中初始化
     }
-    std::vector<Token> ScanTokens()
+    std::vector<Token> ScanTokens() // 扫描源代码
     {
-        while (!IsAtEnd())
+        while (!IsAtEnd()) // 不是到达末尾
         {
             // We are at the beginning of the next lexeme.
-            start = current;
+            start = current; // 记录当前词法单元的起始位置
             ScanToken();
         }
 
@@ -29,33 +29,33 @@ public:
 private:
     const std::string source;  // 源代码
     std::vector<Token> tokens; // 词法单元列表
-    unsigned start = 0;        // 记录当前词法单元的起始位置
-    unsigned current = 0;      // 记录当前词法单元的结束位置
-    unsigned line = 1;         // 记录当前词法单元所在的行号
+    unsigned start = 0;        // 当前词法单元的起始位置
+    unsigned current = 0;      // 当前词法单元的结束位置
+    unsigned line = 1;         // 当前词法单元所在的行号
 
-    bool IsAtEnd() // 判断是否到达末尾
-    {
-        return current >= source.length();
-    }
+    std::unordered_map<std::string, TokenType> keywords = {
+        {"and", TokenType::AND},
+        {"class", TokenType::CLASS},
+        {"else", TokenType::ELSE},
+        {"false", TokenType::FALSE},
+        {"for", TokenType::FOR},
+        {"fun", TokenType::FUN},
+        {"if", TokenType::IF},
+        {"nil", TokenType::NIL},
+        {"or", TokenType::OR},
+        {"print", TokenType::PRINT},
+        {"return", TokenType::RETURN},
+        {"super", TokenType::SUPER},
+        {"this", TokenType::THIS},
+        {"true", TokenType::TRUE},
+        {"var", TokenType::VAR},
+        {"while", TokenType::WHILE}
+        // 其他关键字
+    };
 
-    char Advance() // 读取下一个字符
+    void ScanToken() // 扫描词法单元
     {
-        current++;
-        return source[current - 1];
-    }
-    void AddToken(TokenType type) // 添加词法单元
-    {
-        AddToken(type, nullptr);
-    }
-    void AddToken(TokenType type, std::variant<double, std::string, std::nullptr_t> literal) // 添加词法单元
-    {
-        // std::string text = source.substring(start, current); // 从源代码中截取出当前词法单元的字符串
-        std::string text = source.substr(start, current - start); // 从源代码中截取出当前词法单元的字符串
-        tokens.push_back(Token(type, text, literal, line));       // 将当前词法单元添加到词法单元列表中
-    }
-    void ScanToken() // 词法分析
-    {
-        char c = Advance();
+        char c = Advance(); // 读取下一个字符
         switch (c)
         {
         case '(':
@@ -103,8 +103,7 @@ private:
         case '/':
             if (Match('/'))
             {
-
-                while (Peek() != '\n' && !IsAtEnd())
+                while (Peek() != '\n' && !IsAtEnd()) // 读取注释
                     Advance();
             }
             else
@@ -117,14 +116,13 @@ private:
         case '\t':
             // Ignore whitespace.
             break;
-
-        case '\n':
+        case '\n': // 处理换行符
             line++;
             break;
-        case '"':
+        case '"': // 处理字符串
             String();
             break;
-        default:
+        default: // 处理数字和标识符
             if (IsDigit(c))
             {
                 Number();
@@ -141,17 +139,65 @@ private:
             break;
         }
     }
-    void Identifier()
+
+    char Peek() // 查看下一个字符
+    {
+        if (IsAtEnd())
+            return '\0';
+        return source[current]; // 返回当前词法单元的下一个字符
+    }
+
+    char PeekNext() // 查看下下一个字符
+    {
+        if (current + 1 >= source.length())
+            return '\0';
+        return source[current + 1];
+    }
+
+    char Advance() // 读取下一个字符
+    {
+        current++;
+        return source[current - 1];
+    }
+
+    void AddToken(TokenType type) // 添加词法单元
+    {
+        AddToken(type, nullptr);
+    }
+
+    void AddToken(TokenType type, std::variant<double, std::string, std::nullptr_t> literal) // 添加词法单元
+    {
+        // std::string text = source.substring(start, current); // 从源代码中截取出当前词法单元的字符串
+        std::string text = source.substr(start, current - start); // 从源代码中截取出当前词法单元的字符串
+        tokens.push_back(Token(type, text, literal, line));       // 将当前词法单元添加到词法单元列表中
+    }
+
+    void Number()
+    {
+        while (IsDigit(Peek())) // 整数
+            Advance();
+
+        // Look for a fractional part.
+        if (Peek() == '.' && IsDigit(PeekNext())) // 浮点数
+        {
+            // Consume the "."
+            Advance();
+
+            while (IsDigit(Peek()))
+                Advance();
+        }
+
+        AddToken(NUMBER, std::stod(source.substr(start, current - start))); // 将字符串转换为double类型加入词法单元列表中
+    }
+
+    void Identifier() // 处理标识符
     {
         while (IsAlphaNumeric(Peek()))
             Advance();
 
-        std::string text = source.substr(start, current); // 从源代码中截取出当前词法单元的字符串
-        // keywords["default"] = TokenType::FAULT;
-        //  TokenType type = keywords[text];
-        //  if (type ==) // 如果当前词法单元不是关键字，则将其类型设置为标识符
-        //      type = IDENTIFIER;
-        TokenType type;
+        std::string text = source.substr(start, current - start); // 截出字符串
+
+        TokenType type; // 标识符的类型
         auto it = keywords.find(text);
 
         if (it != keywords.end())
@@ -162,34 +208,13 @@ private:
         else
         {
             type = TokenType::IDENTIFIER;
-            // 处理未找到的情况
+            // 处理未找到的情况默认为IDENTIFIER
         }
 
         AddToken(type);
     }
-    void Number()
-    {
-        while (IsDigit(Peek()))
-            Advance();
 
-        // Look for a fractional part.
-        if (Peek() == '.' && IsDigit(PeekNext()))
-        {
-            // Consume the "."
-            Advance();
-
-            while (IsDigit(Peek()))
-                Advance();
-        }
-
-        AddToken(NUMBER,
-                 std::stod(source.substr(start, current)));
-    }
-    bool IsDigit(char c)
-    {
-        return c >= '0' && c <= '9';
-    }
-    void String()
+    void String() // 处理字符串
     {
         while (Peek() != '"' && !IsAtEnd())
         {
@@ -209,10 +234,16 @@ private:
         Advance();
 
         // Trim the surrounding quotes.
-        std::string value = source.substr(start + 1, current - 1);
+        std::string value = source.substr(start + 1, current - start - 2);
         AddToken(STRING, value);
     }
-    bool Match(char expected)
+
+    bool IsDigit(char c) // 判断是否为数字
+    {
+        return c >= '0' && c <= '9';
+    }
+
+    bool Match(const char expected) // 判断当前词法单元是否匹配
     {
         if (IsAtEnd())
             return false;
@@ -223,46 +254,21 @@ private:
         return true;
     }
 
-    char Peek()
-    {
-        if (IsAtEnd())
-            return '\0';
-        return source[current];
-    }
-    char PeekNext()
-    {
-        if (current + 1 >= source.length())
-            return '\0';
-        return source[current + 1];
-    }
-    bool IsAlpha(char c)
+    bool IsAlpha(char c) // 判断是否为字母
     {
         return (c >= 'a' && c <= 'z') ||
                (c >= 'A' && c <= 'Z') ||
                c == '_';
     }
-    bool IsAlphaNumeric(char c)
+
+    bool IsAlphaNumeric(char c) // 判断是否为字母或数字
     {
         return IsAlpha(c) || IsDigit(c);
     }
-    std::unordered_map<std::string, TokenType> keywords = {
-        {"and", TokenType::AND},
-        {"class", TokenType::CLASS},
-        {"else", TokenType::ELSE},
-        {"false", TokenType::FALSE},
-        {"for", TokenType::FOR},
-        {"fun", TokenType::FUN},
-        {"if", TokenType::IF},
-        {"nil", TokenType::NIL},
-        {"or", TokenType::OR},
-        {"print", TokenType::PRINT},
-        {"return", TokenType::RETURN},
-        {"super", TokenType::SUPER},
-        {"this", TokenType::THIS},
-        {"true", TokenType::TRUE},
-        {"var", TokenType::VAR},
-        {"while", TokenType::WHILE}
-        // 其他关键字
-    };
+
+    bool IsAtEnd() // 判断是否到达末尾
+    {
+        return current >= source.length();
+    }
 };
 #endif // SCANNER_H

@@ -26,6 +26,10 @@ public:
             std::string literal_value = std::get<std::string>(literal);
             std::cout << "Stored string: " << literal_value << std::endl;
         }
+        else if (std::holds_alternative<std::nullptr_t>(literal))
+        {
+            std::cout << "Stored nullptr" << std::endl;
+        }
         // std::cout << literal.index() << std::endl;
         return TokenType2String(type) + " " + lexeme + " ";
         //     +std::any_cast<std::string>(literal);type +
