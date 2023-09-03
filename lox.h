@@ -9,8 +9,9 @@
 #include <vector>
 #include "token.h"
 #include "scanner.h"
+#include "error.h"
 
-static bool had_error = false; // 用于标记是否有错误
+// static bool had_error = false;
 
 class Lox
 {
@@ -47,10 +48,10 @@ public:
             had_error = false;
         }
     }
-    static void Error(int line, std::string message)
-    {
-        Report(line, "", message);
-    }
+    // static void Error(int line, std::string message)
+    // {
+    //     Report(line, "", message);
+    // }
 
 private:
     static void Run(const std::string &source) // 运行源代码
@@ -64,10 +65,10 @@ private:
             std::cout << token.ToString() << std::endl; // 打印词法单元
         }
     }
-    static void Report(int line, std::string where, std::string message) // 报告错误
-    {
-        std::cerr << "[line " << line << "] Error" + where + ": " + message << std::endl;
-        had_error = true;
-    }
+    // static void Report(int line, std::string where, std::string message) // 报告错误
+    // {
+    //     std::cerr << "[line " << line << "] Error" + where + ": " + message << std::endl;
+    //     had_error = true;
+    // }
 };
 #endif // LOX_H

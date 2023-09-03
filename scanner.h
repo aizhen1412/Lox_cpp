@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include "token.h"
 #include "token_type.h"
+#include "error.h"
 
 class Scanner
 {
@@ -133,8 +134,8 @@ private:
             }
             else
             {
-                // Lox::Error(line, "Unexpected character.");
-                std::cout << "Unexpected character." << std::endl;
+                Error::ErrorFind(line, "Unexpected character.");
+                // std::cout << "Unexpected character." << std::endl;
             }
             break;
         }
@@ -225,8 +226,8 @@ private:
 
         if (IsAtEnd())
         {
-            // Lox::Error(line, "Unterminated string.");
-            std::cout << "Unterminated string." << std::endl;
+            Error::ErrorFind(line, "Unterminated string.");
+            // std::cout << "Unterminated string." << std::endl;
             return;
         }
 
