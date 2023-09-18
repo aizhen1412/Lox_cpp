@@ -34,10 +34,10 @@ public:
         return TokenType2String(type) + " " + lexeme + " ";
         //     +std::any_cast<std::string>(literal);type +
     }
+    const std::string lexeme; // 词法单元的字符串
 
 private:
     const TokenType type;                                            // 词法单元的类型
-    const std::string lexeme;                                        // 词法单元的字符串
     const std::variant<double, std::string, std::nullptr_t> literal; // 词法单元的字面量
     const int line;                                                  // 词法单元所在的行号
 };
