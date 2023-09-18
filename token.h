@@ -1,6 +1,8 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#define Object std::variant<double, std::string, std::nullptr_t>
+
 #include <string>
 #include <variant>
 #include <iostream>
@@ -9,7 +11,7 @@
 class Token // 词法单元
 {
 public:
-    Token(TokenType type, std::string lexeme, std::variant<double, std::string, std::nullptr_t> literal, int line)
+    Token(TokenType type, const std::string lexeme, Object literal, int line)
         : type(type), lexeme(lexeme), literal(literal), line(line)
     {
         // 构造函数体为空，因为成员变量已经在初始化列表中初始化
@@ -34,11 +36,10 @@ public:
         return TokenType2String(type) + " " + lexeme + " ";
         //     +std::any_cast<std::string>(literal);type +
     }
-    const std::string lexeme; // 词法单元的字符串
 
-private:
-    const TokenType type;                                            // 词法单元的类型
-    const std::variant<double, std::string, std::nullptr_t> literal; // 词法单元的字面量
-    const int line;                                                  // 词法单元所在的行号
+    const TokenType type;     // 词法单元的类型
+    const std::string lexeme; // 词法单元的字符串
+    const Object literal;     // 词法单元的字面量
+    const int line;           // 词法单元所在的行号
 };
 #endif // TOKEN_H

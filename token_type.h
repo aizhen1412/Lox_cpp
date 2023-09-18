@@ -173,6 +173,7 @@ std::string TokenType2String(TokenType TokenType)
         return "END_OF_FILE";
         break;
     default:
+        return "UNKNOWN";
         break;
     }
 }

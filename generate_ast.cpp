@@ -18,8 +18,6 @@
 //     outputFile << "#include <vector>" << std::endl;
 //     outputFile << "#include \"token.h\"" << std::endl
 //                << std::endl;
-//     outputFile << "#define Object std::variant<double, std::string, std::nullptr_t>" << std::endl
-//                << std::endl;
 //     outputFile << "class Visitor;" << std::endl;
 
 //     for (const std::string &type : types) // Define all the classes

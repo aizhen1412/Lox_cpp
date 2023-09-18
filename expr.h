@@ -4,8 +4,6 @@
 #include <vector>
 #include "token.h"
 
-#define Object std::variant<double, std::string, std::nullptr_t>
-
 class Visitor;
 class Assign;
 class Binary;
