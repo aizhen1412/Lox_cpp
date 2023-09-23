@@ -12,11 +12,11 @@
 class Interpreter : AstPrinter // 后面换成visitor
 {
 public:
-    Object VisitLiteral(Literal &expr)
+    Object VisitLiteral(Literal &expr) override
     {
         return expr.value;
     }
-    Object VisitUnary(Unary &expr)
+    Object VisitUnary(Unary &expr) override
     {
         Object right = Evaluate(expr.right);
 
@@ -32,11 +32,11 @@ public:
         // Unreachable.
         return nullptr;
     }
-    Object VisitGrouping(Grouping &expr)
+    Object VisitGrouping(Grouping &expr) override
     {
         return Evaluate(expr.expression);
     }
-    Object VisitBinary(Binary &expr)
+    Object VisitBinary(Binary &expr) override
     {
         Object left = Evaluate(expr.left);
         Object right = Evaluate(expr.right);
@@ -44,37 +44,37 @@ public:
         switch (expr.op.type)
         {
         case GREATER:
-            checkNumberOperands(expr.op, left, right);
+            CheckNumberOperands(expr.op, left, right);
             return std::get<double>(left) > std::get<double>(right);
         case GREATER_EQUAL:
-            checkNumberOperands(expr.op, left, right);
+            CheckNumberOperands(expr.op, left, right);
             return std::get<double>(left) >= std::get<double>(right);
         case LESS:
-            checkNumberOperands(expr.op, left, right);
+            CheckNumberOperands(expr.op, left, right);
             return std::get<double>(left) < std::get<double>(right);
         case LESS_EQUAL:
-            checkNumberOperands(expr.op, left, right);
+            CheckNumberOperands(expr.op, left, right);
             return std::get<double>(left) <= std::get<double>(right);
         case MINUS:
-            checkNumberOperands(expr.op, left, right);
+            CheckNumberOperands(expr.op, left, right);
             return std::get<double>(left) - std::get<double>(right);
         case PLUS:
-            if (std::holds_alternative<double>(left) && std::holds_alternative<double>(left))
+            if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right))
             {
                 return std::get<double>(left) + std::get<double>(right);
             }
 
-            if (std::holds_alternative<std::string>(left) && std::holds_alternative<std::string>(left))
+            if (std::holds_alternative<std::string>(left) && std::holds_alternative<std::string>(right))
             {
                 return std::get<std::string>(left) + std::get<std::string>(right);
             }
             throw new RuntimeError(expr.op, "Operands must be two numbers or two strings.");
             break;
         case SLASH:
-            checkNumberOperands(expr.op, left, right);
+            CheckNumberOperands(expr.op, left, right);
             return std::get<double>(left) / std::get<double>(right);
         case STAR:
-            checkNumberOperands(expr.op, left, right);
+            CheckNumberOperands(expr.op, left, right);
             return std::get<double>(left) * std::get<double>(right);
         case BANG_EQUAL:
             return !IsEqual(left, right);
@@ -85,13 +85,13 @@ public:
         // Unreachable.
         return nullptr;
     }
-    void CheckNumberOperand(Token op, Object operand)
+    void CheckNumberOperand(Token op, Object operand) // 检查操作数是否为数字
     {
         if (std::holds_alternative<double>(operand))
             return;
         throw new RuntimeError(op, "Operand must be a number.");
     }
-    void checkNumberOperands(Token op, Object left, Object right)
+    void CheckNumberOperands(Token op, Object left, Object right) // 检查操作数是否为数字
     {
         if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right))
             return;
@@ -145,17 +145,17 @@ public:
     }
     void Interpret(Expr *expression)
     {
-        Object value = Evaluate(expression);
-        std::cout << Stringify(value) << std::endl;
-        // try
-        // {
-        //     Object value = evaluate(expression);
-        //     std::cout << stringify(value) << std::endl;
-        // }
-        // catch (RuntimeError error)
-        // {
-        //     Error::runtimeError(error);
-        // }
+        // Object value = Evaluate(expression);
+        // std::cout << Stringify(value) << std::endl;
+        try
+        {
+            Object value = Evaluate(expression);
+            std::cout << Stringify(value) << std::endl;
+        }
+        catch (const RuntimeError &error)
+        {
+            Error::RuntimeError(error);
+        }
     }
     std::string Stringify(Object object)
     {
