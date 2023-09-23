@@ -1,7 +1,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#define Object std::variant<double, std::string, std::nullptr_t>
+#define Object std::variant<double, bool, std::string, std::nullptr_t>
 
 #include <string>
 #include <variant>
@@ -37,9 +37,9 @@ public:
         //     +std::any_cast<std::string>(literal);type +
     }
 
-    const TokenType type;     // 词法单元的类型
-    const std::string lexeme; // 词法单元的字符串
-    const Object literal;     // 词法单元的字面量
-    const int line;           // 词法单元所在的行号
+    TokenType type;     // 词法单元的类型
+    std::string lexeme; // 词法单元的字符串
+    Object literal;     // 词法单元的字面量
+    int line;           // 词法单元所在的行号
 };
 #endif // TOKEN_H

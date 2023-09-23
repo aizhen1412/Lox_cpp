@@ -31,7 +31,7 @@
 //                << "{" << std::endl;
 //     outputFile << "public:" << std::endl;
 //     outputFile << "    virtual ~" << baseName << "() {}" << std::endl;
-//     outputFile << "    virtual std::string Accept(Visitor& visitor) = 0;" << std::endl;
+//     outputFile << "    virtual Object Accept(Visitor& visitor) = 0;" << std::endl;
 //     outputFile << "};" << std::endl
 //                << std::endl;
 
@@ -43,7 +43,7 @@
 //     for (const std::string &type : types)
 //     {
 //         std::string typeName = type.substr(0, type.find(':'));
-//         outputFile << "    virtual std::string Visit" << typeName << "("
+//         outputFile << "    virtual Object Visit" << typeName << "("
 //                    << typeName << "& " << baseName << ") = 0;" << std::endl;
 //     }
 
@@ -94,7 +94,7 @@
 //         outputFile << " {}" << std::endl;
 
 //         // Accept method
-//         outputFile << "    std::string Accept(Visitor& visitor) override " << std::endl
+//         outputFile << "    Object Accept(Visitor& visitor) override " << std::endl
 //                    << "    {" << std::endl;
 //         outputFile << "    return visitor.Visit" << typeName << "(*this);" << std::endl;
 //         outputFile << "    }" << std::endl;

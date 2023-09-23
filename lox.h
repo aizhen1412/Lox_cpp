@@ -10,8 +10,8 @@
 #include "token.h"
 #include "scanner.h"
 #include "error.h"
-
-// static bool had_error = false;
+#include "parser.h"
+#include "interpreter.h"
 
 class Lox
 {
@@ -44,14 +44,11 @@ public:
             {
                 break;
             }
+            line = line + "EOF";
             Run(line);
             had_error = false;
         }
     }
-    // static void Error(int line, std::string message)
-    // {
-    //     Report(line, "", message);
-    // }
 
 private:
     static void Run(const std::string &source) // 运行源代码
@@ -59,16 +56,30 @@ private:
         Scanner scanner(source);                          // 词法分析
         std::vector<Token> tokens = scanner.ScanTokens(); // 存储词法单元
 
-        // For now, just print the tokens.
-        for (const Token &token : tokens)
+        Parser parser(tokens);
+        Expr *expression = parser.Parse();
+        if (expression == nullptr)
         {
-            std::cout << token.ToString() << std::endl; // 打印词法单元
+            return;
         }
+        if (had_error)
+        {
+            return;
+        }
+        if (hadRuntimeError)
+            return;
+
+        Interpreter interpreter;
+        interpreter.Interpret(expression);
+        // AstPrinter astPrinter;
+        // std::cout << (std::get<std::string>(astPrinter.print(*expression))) << std::endl;
+
+        // System.out.println(new AstPrinter().print(expression));
+        // For now, just print the tokens.
+        // for (const Token &token : tokens)
+        // {
+        //     std::cout << token.ToString() << std::endl; // 打印词法单元
+        // }
     }
-    // static void Report(int line, std::string where, std::string message) // 报告错误
-    // {
-    //     std::cerr << "[line " << line << "] Error" + where + ": " + message << std::endl;
-    //     had_error = true;
-    // }
 };
 #endif // LOX_H

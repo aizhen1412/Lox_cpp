@@ -22,31 +22,31 @@ class Expr
 {
 public:
   virtual ~Expr() {}
-  virtual std::string Accept(Visitor &visitor) = 0;
+  virtual Object Accept(Visitor &visitor) = 0;
 };
 
 class Visitor
 {
 public:
-  virtual std::string VisitAssign(Assign &Expr) = 0;
-  virtual std::string VisitBinary(Binary &Expr) = 0;
-  virtual std::string VisitCall(Call &Expr) = 0;
-  virtual std::string VisitGet(Get &Expr) = 0;
-  virtual std::string VisitGrouping(Grouping &Expr) = 0;
-  virtual std::string VisitLiteral(Literal &Expr) = 0;
-  virtual std::string VisitLogical(Logical &Expr) = 0;
-  virtual std::string VisitSet(Set &Expr) = 0;
-  virtual std::string VisitSuper(Super &Expr) = 0;
-  virtual std::string VisitThis(This &Expr) = 0;
-  virtual std::string VisitUnary(Unary &Expr) = 0;
-  virtual std::string VisitVariable(Variable &Expr) = 0;
+  virtual Object VisitAssign(Assign &Expr) = 0;
+  virtual Object VisitBinary(Binary &Expr) = 0;
+  virtual Object VisitCall(Call &Expr) = 0;
+  virtual Object VisitGet(Get &Expr) = 0;
+  virtual Object VisitGrouping(Grouping &Expr) = 0;
+  virtual Object VisitLiteral(Literal &Expr) = 0;
+  virtual Object VisitLogical(Logical &Expr) = 0;
+  virtual Object VisitSet(Set &Expr) = 0;
+  virtual Object VisitSuper(Super &Expr) = 0;
+  virtual Object VisitThis(This &Expr) = 0;
+  virtual Object VisitUnary(Unary &Expr) = 0;
+  virtual Object VisitVariable(Variable &Expr) = 0;
 };
 
 class Assign : public Expr
 {
 public:
   Assign(Token name, Expr *value) : name(name), value(value) {}
-  std::string Accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
     return visitor.VisitAssign(*this);
   }
@@ -58,7 +58,7 @@ class Binary : public Expr
 {
 public:
   Binary(Expr *left, Token op, Expr *right) : left(left), op(op), right(right) {}
-  std::string Accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
     return visitor.VisitBinary(*this);
   }
@@ -71,7 +71,7 @@ class Call : public Expr
 {
 public:
   Call(Expr *callee, Token paren, std::vector<Expr *> arguments) : callee(callee), paren(paren), arguments(arguments) {}
-  std::string Accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
     return visitor.VisitCall(*this);
   }
@@ -84,7 +84,7 @@ class Get : public Expr
 {
 public:
   Get(Expr *object, Token name) : object(object), name(name) {}
-  std::string Accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
     return visitor.VisitGet(*this);
   }
@@ -96,7 +96,7 @@ class Grouping : public Expr
 {
 public:
   Grouping(Expr *expression) : expression(expression) {}
-  std::string Accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
     return visitor.VisitGrouping(*this);
   }
@@ -107,7 +107,7 @@ class Literal : public Expr
 {
 public:
   Literal(Object value) : value(value) {}
-  std::string Accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
     return visitor.VisitLiteral(*this);
   }
@@ -118,7 +118,7 @@ class Logical : public Expr
 {
 public:
   Logical(Expr *left, Token op, Expr *right) : left(left), op(op), right(right) {}
-  std::string Accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
     return visitor.VisitLogical(*this);
   }
@@ -131,7 +131,7 @@ class Set : public Expr
 {
 public:
   Set(Expr *object, Token name, Expr *value) : object(object), name(name), value(value) {}
-  std::string Accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
     return visitor.VisitSet(*this);
   }
@@ -144,7 +144,7 @@ class Super : public Expr
 {
 public:
   Super(Token keyword, Token method) : keyword(keyword), method(method) {}
-  std::string Accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
     return visitor.VisitSuper(*this);
   }
@@ -156,7 +156,7 @@ class This : public Expr
 {
 public:
   This(Token keyword) : keyword(keyword) {}
-  std::string Accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
     return visitor.VisitThis(*this);
   }
@@ -167,7 +167,7 @@ class Unary : public Expr
 {
 public:
   Unary(Token op, Expr *right) : op(op), right(right) {}
-  std::string Accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
     return visitor.VisitUnary(*this);
   }
@@ -179,7 +179,7 @@ class Variable : public Expr
 {
 public:
   Variable(Token name) : name(name) {}
-  std::string Accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
     return visitor.VisitVariable(*this);
   }
