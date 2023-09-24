@@ -1,6 +1,6 @@
 # Lox_cpp (C++ implementation of Lox）
 
-Lox解释器的C++实现 (进行中)
+Lox解释器的C++实现 (C++ implementation of Lox) (进行中)
 
 ## 概述
 
