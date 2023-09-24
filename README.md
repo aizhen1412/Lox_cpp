@@ -1,4 +1,4 @@
-# Lox_cpp
+# Lox_cpp (C++ 实现)
 
 Lox解释器的C++实现 (进行中)
 
