@@ -45,11 +45,8 @@ public:
 class Assign : public Expr
 {
 public:
-  Assign(Token name, Expr *value) : name(name), value(value) {}
-  Object Accept(Visitor &visitor) override
-  {
-    return visitor.VisitAssign(*this);
-  }
+  Assign(Token name, Expr *value);
+  Object Accept(Visitor &visitor) override;
   Token name;
   Expr *value;
 };
@@ -57,11 +54,8 @@ public:
 class Binary : public Expr
 {
 public:
-  Binary(Expr *left, Token op, Expr *right) : left(left), op(op), right(right) {}
-  Object Accept(Visitor &visitor) override
-  {
-    return visitor.VisitBinary(*this);
-  }
+  Binary(Expr *left, Token op, Expr *right);
+  Object Accept(Visitor &visitor) override;
   Expr *left;
   Token op;
   Expr *right;
@@ -70,11 +64,8 @@ public:
 class Call : public Expr
 {
 public:
-  Call(Expr *callee, Token paren, std::vector<Expr *> arguments) : callee(callee), paren(paren), arguments(arguments) {}
-  Object Accept(Visitor &visitor) override
-  {
-    return visitor.VisitCall(*this);
-  }
+  Call(Expr *callee, Token paren, std::vector<Expr *> arguments);
+  Object Accept(Visitor &visitor) override;
   Expr *callee;
   Token paren;
   std::vector<Expr *> arguments;
@@ -83,11 +74,8 @@ public:
 class Get : public Expr
 {
 public:
-  Get(Expr *object, Token name) : object(object), name(name) {}
-  Object Accept(Visitor &visitor) override
-  {
-    return visitor.VisitGet(*this);
-  }
+  Get(Expr *object, Token name);
+  Object Accept(Visitor &visitor) override;
   Expr *object;
   Token name;
 };
@@ -95,33 +83,24 @@ public:
 class Grouping : public Expr
 {
 public:
-  Grouping(Expr *expression) : expression(expression) {}
-  Object Accept(Visitor &visitor) override
-  {
-    return visitor.VisitGrouping(*this);
-  }
+  Grouping(Expr *expression);
+  Object Accept(Visitor &visitor) override;
   Expr *expression;
 };
 
 class Literal : public Expr
 {
 public:
-  Literal(Object value) : value(value) {}
-  Object Accept(Visitor &visitor) override
-  {
-    return visitor.VisitLiteral(*this);
-  }
+  Literal(Object value);
+  Object Accept(Visitor &visitor) override;
   Object value;
 };
 
 class Logical : public Expr
 {
 public:
-  Logical(Expr *left, Token op, Expr *right) : left(left), op(op), right(right) {}
-  Object Accept(Visitor &visitor) override
-  {
-    return visitor.VisitLogical(*this);
-  }
+  Logical(Expr *left, Token op, Expr *right);
+  Object Accept(Visitor &visitor) override;
   Expr *left;
   Token op;
   Expr *right;
@@ -130,11 +109,8 @@ public:
 class Set : public Expr
 {
 public:
-  Set(Expr *object, Token name, Expr *value) : object(object), name(name), value(value) {}
-  Object Accept(Visitor &visitor) override
-  {
-    return visitor.VisitSet(*this);
-  }
+  Set(Expr *object, Token name, Expr *value);
+  Object Accept(Visitor &visitor) override;
   Expr *object;
   Token name;
   Expr *value;
@@ -143,11 +119,8 @@ public:
 class Super : public Expr
 {
 public:
-  Super(Token keyword, Token method) : keyword(keyword), method(method) {}
-  Object Accept(Visitor &visitor) override
-  {
-    return visitor.VisitSuper(*this);
-  }
+  Super(Token keyword, Token method);
+  Object Accept(Visitor &visitor) override;
   Token keyword;
   Token method;
 };
@@ -155,22 +128,16 @@ public:
 class This : public Expr
 {
 public:
-  This(Token keyword) : keyword(keyword) {}
-  Object Accept(Visitor &visitor) override
-  {
-    return visitor.VisitThis(*this);
-  }
+  This(Token keyword);
+  Object Accept(Visitor &visitor) override;
   Token keyword;
 };
 
 class Unary : public Expr
 {
 public:
-  Unary(Token op, Expr *right) : op(op), right(right) {}
-  Object Accept(Visitor &visitor) override
-  {
-    return visitor.VisitUnary(*this);
-  }
+  Unary(Token op, Expr *right);
+  Object Accept(Visitor &visitor) override;
   Token op;
   Expr *right;
 };
@@ -178,11 +145,8 @@ public:
 class Variable : public Expr
 {
 public:
-  Variable(Token name) : name(name) {}
-  Object Accept(Visitor &visitor) override
-  {
-    return visitor.VisitVariable(*this);
-  }
+  Variable(Token name);
+  Object Accept(Visitor &visitor) override;
   Token name;
 };
 
