@@ -194,6 +194,12 @@ bool Parser::IsAtEnd()
 
 Token Parser::Peek()
 {
+    if (current >= tokens.size())
+    {
+        Token token(END_OF_FILE, "", nullptr, 0);
+        return token;
+    }
+
     return tokens[current];
 }
 

@@ -37,7 +37,6 @@ void Lox::RunPrompt()
         {
             break;
         }
-        line = line + "EOF";
         Run(line);
         had_error = false;
     }
