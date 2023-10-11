@@ -12,13 +12,14 @@ public:
     Parser(std::vector<Token> tokens);
     std::vector<Stmt *> parse();
 
+    class ParseError
+    {
+    };
+
 private:
     int current = 0;
     std::vector<Token> tokens;
 
-    class ParseError
-    {
-    };
     Expr *Expression_method();
 
     Stmt *printStatement();

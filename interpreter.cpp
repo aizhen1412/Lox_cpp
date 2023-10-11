@@ -1,5 +1,6 @@
 #include "interpreter.h"
 #include "error.h"
+#include "parser.h"
 
 Object Interpreter::VisitLiteral(Literal &expr)
 {
