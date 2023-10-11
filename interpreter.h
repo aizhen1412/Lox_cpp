@@ -2,6 +2,7 @@
 #define INTERPRETER_H
 
 #include <iostream>
+#include <memory>
 #include "ast_printer.h"
 #include "expr.h"
 
@@ -17,7 +18,10 @@ public:
     bool IsTruthy(Object object);
     bool IsEqual(Object a, Object b);
     Object Evaluate(Expr *expr);
-    void Interpret(Expr *expression);
+    void execute(Stmt *stmt);
+    Object visitExpressionStmt(Expression &stmt);
+    Object visitPrintStmt(Print &stmt);
+    void Interpret(std::vector<Stmt *> statements);
     std::string Stringify(Object object);
 };
 

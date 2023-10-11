@@ -48,11 +48,11 @@ void Lox::Run(const std::string &source) // 运行源代码
     std::vector<Token> tokens = scanner.ScanTokens(); // 存储词法单元
 
     Parser parser(tokens);
-    Expr *expression = parser.Parse();
-    if (expression == nullptr)
-    {
-        return;
-    }
+    std::vector<Stmt *> statements = parser.parse();
+    // if (expression == nullptr)
+    // {
+    //     return;
+    // }
     if (had_error)
     {
         return;
@@ -61,7 +61,7 @@ void Lox::Run(const std::string &source) // 运行源代码
         return;
 
     Interpreter interpreter;
-    interpreter.Interpret(expression);
+    interpreter.Interpret(statements);
     // AstPrinter astPrinter;
     // std::cout << (std::get<std::string>(astPrinter.print(*expression))) << std::endl;
 

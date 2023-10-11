@@ -36,6 +36,7 @@ Object AstPrinter::VisitLiteral(Literal &expr)
     std::string result = std::visit(ToStringVisitor(), expr.value);
     return result;
 }
+
 Object AstPrinter::VisitCall(Call &Expr)
 {
     return "test";
@@ -65,6 +66,42 @@ Object AstPrinter::VisitThis(This &Expr)
     return "test";
 };
 Object AstPrinter::VisitVariable(Variable &Expr)
+{
+    return "test";
+};
+Object AstPrinter::visitBlockStmt(Block &stmt)
+{
+    return "test";
+};
+Object AstPrinter::visitClassStmt(Class &stmt)
+{
+    return "test";
+};
+Object AstPrinter::visitExpressionStmt(Expression &stmt)
+{
+    return "test";
+};
+Object AstPrinter::visitFunctionStmt(Function &stmt)
+{
+    return "test";
+};
+Object AstPrinter::visitIfStmt(If &stmt)
+{
+    return "test";
+};
+Object AstPrinter::visitPrintStmt(Print &stmt)
+{
+    return "test";
+};
+Object AstPrinter::visitReturnStmt(Return &stmt)
+{
+    return "test";
+};
+Object AstPrinter::visitVarStmt(Var &stmt)
+{
+    return "test";
+};
+Object AstPrinter::visitWhileStmt(While &stmt)
 {
     return "test";
 };

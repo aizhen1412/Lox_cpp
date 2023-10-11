@@ -28,6 +28,16 @@ public:
     Object VisitThis(This &Expr) override;
     Object VisitVariable(Variable &Expr) override;
 
+    Object visitBlockStmt(Block &stmt) override;
+    Object visitClassStmt(Class &stmt) override;
+    Object visitExpressionStmt(Expression &stmt) override;
+    Object visitFunctionStmt(Function &stmt) override;
+    Object visitIfStmt(If &stmt) override;
+    Object visitPrintStmt(Print &stmt) override;
+    Object visitReturnStmt(Return &stmt) override;
+    Object visitVarStmt(Var &stmt) override;
+    Object visitWhileStmt(While &stmt) override;
+
 private:
     template <typename T, typename... Args>
     std::string parenthesize(const T &name, Args... expr);

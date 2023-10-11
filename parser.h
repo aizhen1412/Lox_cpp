@@ -2,6 +2,7 @@
 #define PARSER_H
 
 #include <vector>
+#include <memory>
 #include "token.h"
 #include "expr.h"
 
@@ -9,7 +10,7 @@ class Parser
 {
 public:
     Parser(std::vector<Token> tokens);
-    Expr *Parse();
+    std::vector<Stmt *> parse();
 
 private:
     int current = 0;
@@ -18,7 +19,12 @@ private:
     class ParseError
     {
     };
-    Expr *Expression();
+    Expr *Expression_method();
+
+    Stmt *printStatement();
+    Stmt *expressionStatement();
+    Stmt *statement();
+
     Expr *Equality();
     Expr *Comparison();
     Expr *Term();

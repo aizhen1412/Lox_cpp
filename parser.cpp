@@ -7,21 +7,47 @@ Parser::Parser(std::vector<Token> tokens)
     this->tokens = tokens;
 }
 
-Expr *Parser::Parse() // 解析表达式
+std::vector<Stmt *> Parser::parse() // 解析表达式
 {
-    try
+    // try
+    // {
+    //     return Expression();
+    // }
+    // catch (ParseError error)
+    // {
+    //     return nullptr;
+    // }
+    std::vector<Stmt *> statements;
+    while (!IsAtEnd())
     {
-        return Expression();
+        statements.push_back(statement());
     }
-    catch (ParseError error)
-    {
-        return nullptr;
-    }
+
+    return statements;
 }
 
-Expr *Parser::Expression()
+Expr *Parser::Expression_method()
 {
     return Equality(); // 等式
+}
+Stmt *Parser::printStatement()
+{
+    Expr *value = Expression_method();
+    Consume(SEMICOLON, "Expect ';' after value.");
+    return new Print(value);
+}
+Stmt *Parser::expressionStatement()
+{
+    Expr *expr = Expression_method();
+    Consume(SEMICOLON, "Expect ';' after expression.");
+    return new Expression(expr);
+}
+Stmt *Parser::statement()
+{
+    if (Match(PRINT))
+        return printStatement();
+
+    return expressionStatement();
 }
 
 Expr *Parser::Equality()
@@ -108,7 +134,7 @@ Expr *Parser::Primary()
 
     if (Match(LEFT_PAREN))
     {
-        Expr *expr = Expression();
+        Expr *expr = Expression_method();
         Consume(RIGHT_PAREN, "Expect ')' after expression.");
         return new Grouping(expr);
     }
@@ -196,10 +222,8 @@ Token Parser::Peek()
 {
     if (current >= tokens.size())
     {
-        Token token(END_OF_FILE, "", nullptr, 0);
-        return token;
+        return Token(END_OF_FILE, "", nullptr, 0);
     }
-
     return tokens[current];
 }
 

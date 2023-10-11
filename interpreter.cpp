@@ -138,15 +138,40 @@ Object Interpreter::Evaluate(Expr *expr)
 {
     return expr->Accept(*this);
 }
-
-void Interpreter::Interpret(Expr *expression)
+void Interpreter::execute(Stmt *stmt)
+{
+    stmt->accept(*this);
+}
+Object Interpreter::visitExpressionStmt(Expression &stmt)
+{
+    Evaluate(stmt.expression);
+    return nullptr;
+}
+Object Interpreter::visitPrintStmt(Print &stmt)
+{
+    Object value = Evaluate(stmt.expression);
+    std::cout << Stringify(value) << std::endl;
+    return nullptr;
+}
+void Interpreter::Interpret(std::vector<Stmt *> statements)
 {
     // Object value = Evaluate(expression);
     // std::cout << Stringify(value) << std::endl;
+    // try
+    // {
+    //     Object value = Evaluate(expression);
+    //     std::cout << Stringify(value) << std::endl;
+    // }
+    // catch (const RuntimeError &error)
+    // {
+    //     Error::RuntimeError(error);
+    // }
     try
     {
-        Object value = Evaluate(expression);
-        std::cout << Stringify(value) << std::endl;
+        for (const auto &statement : statements)
+        {
+            execute(statement);
+        }
     }
     catch (const RuntimeError &error)
     {
