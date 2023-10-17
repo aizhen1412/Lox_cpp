@@ -23,9 +23,13 @@ private:
     Expr *Expression_method();
 
     Stmt *printStatement();
+    Stmt *varDeclaration();
     Stmt *expressionStatement();
-    Stmt *statement();
+    std::vector<Stmt *> block();
 
+    Expr *assignment();
+    Stmt *statement();
+    Stmt *declaration();
     Expr *Equality();
     Expr *Comparison();
     Expr *Term();

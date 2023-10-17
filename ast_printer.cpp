@@ -41,7 +41,7 @@ Object AstPrinter::VisitCall(Call &Expr)
 {
     return "test";
 };
-Object AstPrinter::VisitAssign(Assign &Expr)
+Object AstPrinter::VisitAssignExpr(Assign &Expr)
 {
     return "test";
 };

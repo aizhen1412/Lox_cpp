@@ -3,7 +3,7 @@
 Assign::Assign(Token name, Expr *value) : name(name), value(value) {}
 Object Assign::Accept(Visitor &visitor)
 {
-    return visitor.VisitAssign(*this);
+    return visitor.VisitAssignExpr(*this);
 }
 Binary::Binary(Expr *left, Token op, Expr *right) : left(left), op(op), right(right) {}
 Object Binary::Accept(Visitor &visitor)

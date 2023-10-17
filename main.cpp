@@ -6,7 +6,7 @@
 
 int main(int argc, char const *argv[])
 {
-    argc = 1; // test
+    argc = 2; // test
     if (argc > 2)
     {
         std::cerr << "Usage: ./cpplox [script]" << std::endl;
@@ -14,7 +14,7 @@ int main(int argc, char const *argv[])
     }
     else if (argc == 2) // 从文件中读取源代码
     {
-        Lox::RunFile(argv[1]);
+        Lox::RunFile("E:\\GitRepository\\Lox_cpp\\test.txt");
     }
     else // 命令行
     {
@@ -22,4 +22,4 @@ int main(int argc, char const *argv[])
 
         return 0;
     }
-} // 8.2
+} // visitVarStmt有问题

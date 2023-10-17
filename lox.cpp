@@ -65,6 +65,8 @@ void Lox::Run(const std::string &source) // 运行源代码
             return;
 
         Interpreter interpreter;
+
+
         interpreter.Interpret(statements);
     }
     catch (const Parser::ParseError &error)

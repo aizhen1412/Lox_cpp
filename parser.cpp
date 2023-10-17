@@ -2,6 +2,8 @@
 #include "parser.h"
 #include "error.h"
 
+#include <iostream>
+
 Parser::Parser(std::vector<Token> tokens)
 {
     this->tokens = tokens;
@@ -20,7 +22,7 @@ std::vector<Stmt *> Parser::parse() // 解析表达式
     std::vector<Stmt *> statements;
     while (!IsAtEnd())
     {
-        statements.push_back(statement());
+        statements.push_back(declaration());    
     }
 
     return statements;
@@ -28,7 +30,8 @@ std::vector<Stmt *> Parser::parse() // 解析表达式
 
 Expr *Parser::Expression_method()
 {
-    return Equality(); // 等式
+    return assignment();
+    //  return Equality(); // 等式
 }
 Stmt *Parser::printStatement()
 {
@@ -36,20 +39,83 @@ Stmt *Parser::printStatement()
     Consume(SEMICOLON, "Expect ';' after value.");
     return new Print(value);
 }
+Stmt *Parser::varDeclaration()
+{
+    Token name = Consume(IDENTIFIER, "Expect variable name.");
+
+    Expr *initializer = nullptr;
+    if (Match(EQUAL))
+    {
+        initializer = Expression_method();
+    }
+
+    Consume(SEMICOLON, "Expect ';' after variable declaration.");
+    return new Var(name, initializer);
+}
 Stmt *Parser::expressionStatement()
 {
     Expr *expr = Expression_method();
     Consume(SEMICOLON, "Expect ';' after expression.");
     return new Expression(expr);
 }
+std::vector<Stmt *> Parser::block()
+{
+    std::vector<Stmt *> statements;
+
+    while (!Check(RIGHT_BRACE) && !IsAtEnd())
+    {
+        statements.push_back(declaration());
+    }
+
+    Consume(RIGHT_BRACE, "Expect '}' after block.");
+
+    return statements;
+}
+
+Expr *Parser::assignment()
+{
+    Expr *expr = Equality();
+
+    if (Match(EQUAL))
+    {
+        Token equals = Previous();
+        Expr *value = assignment();
+
+        if (auto variableExpr = dynamic_cast<Variable *>(expr))
+        {
+            Token name = variableExpr->name;
+            return new Assign(name, value);
+        }
+
+        error(equals, "Invalid assignment target.");
+    }
+
+    return expr;
+}
 Stmt *Parser::statement()
 {
     if (Match(PRINT))
         return printStatement();
+    if (Match(LEFT_BRACE))
+        return new Block(block());
 
     return expressionStatement();
 }
+Stmt *Parser::declaration()
+{
+    try
+    {
+        if (Match(VAR))
+            return varDeclaration();
 
+        return statement();
+    }
+    catch (ParseError error)
+    {
+        // synchronize();
+        return nullptr;
+    }
+}
 Expr *Parser::Equality()
 {
     Expr *expr = Comparison();
@@ -131,7 +197,10 @@ Expr *Parser::Primary()
     {
         return new Literal(Previous().literal);
     }
-
+    if (Match(IDENTIFIER))
+    {
+        return new Variable(Previous());
+    }
     if (Match(LEFT_PAREN))
     {
         Expr *expr = Expression_method();

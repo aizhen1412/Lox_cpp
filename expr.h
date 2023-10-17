@@ -43,7 +43,7 @@ public:
 class Visitor
 {
 public:
-  virtual Object VisitAssign(Assign &Expr) = 0;
+  virtual Object VisitAssignExpr(Assign &Expr) = 0;
   virtual Object VisitBinary(Binary &Expr) = 0;
   virtual Object VisitCall(Call &Expr) = 0;
   virtual Object VisitGet(Get &Expr) = 0;
@@ -178,7 +178,7 @@ public:
 class Block : public Stmt
 {
 public:
-  Block(std::vector<Stmt *> &statements) : statements(statements) {}
+  Block(std::vector<Stmt *> statements) : statements(statements) {}
   virtual ~Block()
   {
     for (auto stmt : statements)

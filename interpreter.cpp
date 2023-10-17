@@ -23,7 +23,10 @@ Object Interpreter::VisitUnary(Unary &expr)
     // Unreachable.
     return nullptr;
 }
-
+Object Interpreter::VisitVariable(Variable &expr)
+{
+    return environment->get(expr.name);
+}
 Object Interpreter::VisitGrouping(Grouping &expr)
 {
     return Evaluate(expr.expression);
@@ -143,6 +146,26 @@ void Interpreter::execute(Stmt *stmt)
 {
     stmt->accept(*this);
 }
+void Interpreter::executeBlock(std::vector<Stmt *> statements, Environment *environment)
+{
+    Environment *previous = this->environment;
+    // try
+    // {
+    this->environment = environment; // Assuming 'environment' is a pointer
+
+    for (auto statement : statements)
+    {
+        execute(statement);
+    }
+    this->environment = previous;
+    // }
+}
+Object Interpreter::visitBlockStmt(Block &stmt)
+{
+    executeBlock(stmt.statements, new Environment(environment));
+
+    return nullptr;
+}
 Object Interpreter::visitExpressionStmt(Expression &stmt)
 {
     Evaluate(stmt.expression);
@@ -153,6 +176,23 @@ Object Interpreter::visitPrintStmt(Print &stmt)
     Object value = Evaluate(stmt.expression);
     std::cout << Stringify(value) << std::endl;
     return nullptr;
+}
+Object Interpreter::visitVarStmt(Var &stmt)
+{
+    Object value = nullptr;
+    if (stmt.initializer != nullptr)
+    {
+        value = Evaluate(stmt.initializer);
+    }
+
+    environment->define(stmt.name.lexeme, value);
+    return nullptr;
+}
+Object Interpreter::VisitAssignExpr(Assign &expr)
+{
+    Object value = Evaluate(expr.value);
+    environment->assign(expr.name, value);
+    return value;
 }
 void Interpreter::Interpret(std::vector<Stmt *> statements)
 {

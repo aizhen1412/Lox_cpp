@@ -20,7 +20,7 @@ public:
     Object VisitUnary(Unary &expr) override;
     Object VisitLiteral(Literal &expr) override;
     Object VisitCall(Call &Expr) override;
-    Object VisitAssign(Assign &Expr) override;
+    Object VisitAssignExpr(Assign &Expr) override;
     Object VisitGet(Get &Expr) override;
     Object VisitLogical(Logical &Expr) override;
     Object VisitSet(Set &Expr) override;
