@@ -55,7 +55,6 @@ public:
   virtual Object VisitThis(This &Expr) = 0;
   virtual Object VisitUnary(Unary &Expr) = 0;
   virtual Object VisitVariable(Variable &Expr) = 0;
-
   virtual Object visitBlockStmt(Block &stmt) = 0;
   virtual Object visitClassStmt(Class &stmt) = 0;
   virtual Object visitExpressionStmt(Expression &stmt) = 0;
@@ -231,6 +230,7 @@ public:
 class Function : public Stmt
 {
 public:
+  Function() = default;
   Function(Token name, std::vector<Token> &params, std::vector<Stmt *> &body) : name(name), params(params), body(body) {}
 
   virtual ~Function()

@@ -5,11 +5,14 @@
 #include "token_type_enum.h"
 #include "token_type_functions.h"
 
-#define Object std::variant<double, bool, std::string, std::nullptr_t>
+class LoxCallable;
+#define Object std::variant<double, bool, std::string, std::nullptr_t, LoxCallable *>
 
 class Token
 {
 public:
+    Token() = default;
+
     TokenType type;
     std::string lexeme;
     Object literal;

@@ -66,20 +66,9 @@ void Lox::Run(const std::string &source) // 运行源代码
 
         Interpreter interpreter;
 
-
         interpreter.Interpret(statements);
     }
     catch (const Parser::ParseError &error)
     {
-        // 待定
     }
-    // AstPrinter astPrinter;
-    // std::cout << (std::get<std::string>(astPrinter.print(*expression))) << std::endl;
-
-    // System.out.println(new AstPrinter().print(expression));
-    // For now, just print the tokens.
-    // for (const Token &token : tokens)
-    // {
-    //     std::cout << token.ToString() << std::endl; // 打印词法单元
-    // }
 }

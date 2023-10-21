@@ -1,12 +1,33 @@
+#include <typeinfo>
 #include "interpreter.h"
 #include "error.h"
 #include "parser.h"
+#include "visit_call_expr.h"
+#include "lox_function.h"
+#include <variant>
+#include "return_method.h"
 
 Object Interpreter::VisitLiteral(Literal &expr)
 {
     return expr.value;
 }
+Object Interpreter::VisitLogical(Logical &expr)
+{
+    Object left = Evaluate(expr.left);
 
+    if (expr.op.type == OR)
+    {
+        if (IsTruthy(left))
+            return left;
+    }
+    else
+    {
+        if (!IsTruthy(left))
+            return left;
+    }
+
+    return Evaluate(expr.right);
+}
 Object Interpreter::VisitUnary(Unary &expr)
 {
     Object right = Evaluate(expr.right);
@@ -25,7 +46,7 @@ Object Interpreter::VisitUnary(Unary &expr)
 }
 Object Interpreter::VisitVariable(Variable &expr)
 {
-    return environment->get(expr.name);
+    return environment->get(expr.name); // retbool
 }
 Object Interpreter::VisitGrouping(Grouping &expr)
 {
@@ -81,7 +102,28 @@ Object Interpreter::VisitBinary(Binary &expr)
     // Unreachable.
     return nullptr;
 }
+Object Interpreter::VisitCall(Call &expr)
+{
+    Object callee = Evaluate(expr.callee);
 
+    std::vector<Object> arguments_;
+    for (Expr *argument : expr.arguments)
+    {
+        arguments_.push_back(Evaluate(argument));
+    }
+
+    if (!(std::holds_alternative<LoxCallable *>(callee)))
+    {
+        throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+    }
+    LoxCallable *function = std::get<LoxCallable *>(callee);
+    if (arguments_.size() != function->arity())
+    {
+        throw new RuntimeError(expr.paren, "Expected " + std::to_string(function->arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
+    }
+    LoxFunction *loxFunction = dynamic_cast<LoxFunction *>(function);
+    return loxFunction->call(this, arguments_);
+}
 void Interpreter::CheckNumberOperand(Token op, Object operand) // 检查操作数是否为数字
 {
     if (std::holds_alternative<double>(operand))
@@ -151,9 +193,9 @@ void Interpreter::executeBlock(std::vector<Stmt *> statements, Environment *envi
     Environment *previous = this->environment;
     // try
     // {
-    this->environment = environment; // Assuming 'environment' is a pointer
-
+    this->environment = environment; // 切换环境
     for (auto statement : statements)
+
     {
         execute(statement);
     }
@@ -171,10 +213,41 @@ Object Interpreter::visitExpressionStmt(Expression &stmt)
     Evaluate(stmt.expression);
     return nullptr;
 }
+Object Interpreter::visitFunctionStmt(Function &stmt)
+{
+    LoxFunction *function = new LoxFunction(stmt, environment);
+    LoxCallable *callable = function;
+    environment->define(stmt.name.lexeme, callable);
+    return nullptr;
+}
+Object Interpreter::visitIfStmt(If &stmt)
+{
+    if (IsTruthy(Evaluate(stmt.condition)))
+    {
+        execute(stmt.thenBranch);
+    }
+    else if (stmt.elseBranch != nullptr)
+    {
+        execute(stmt.elseBranch);
+    }
+    return nullptr;
+}
 Object Interpreter::visitPrintStmt(Print &stmt)
 {
     Object value = Evaluate(stmt.expression);
     std::cout << Stringify(value) << std::endl;
+    return nullptr;
+}
+Object Interpreter::visitReturnStmt(Return &stmt)
+{
+    Object value = nullptr;
+    if (stmt.value != nullptr)
+    {
+        value = Evaluate(stmt.value);
+    }
+
+    throw Return_method(value);
+
     return nullptr;
 }
 Object Interpreter::visitVarStmt(Var &stmt)
@@ -186,6 +259,14 @@ Object Interpreter::visitVarStmt(Var &stmt)
     }
 
     environment->define(stmt.name.lexeme, value);
+    return nullptr;
+}
+Object Interpreter::visitWhileStmt(While &stmt)
+{
+    while (IsTruthy(Evaluate(stmt.condition)))
+    {
+        execute(stmt.body);
+    }
     return nullptr;
 }
 Object Interpreter::VisitAssignExpr(Assign &expr)
@@ -239,6 +320,10 @@ std::string Interpreter::Stringify(Object object)
     if (std::holds_alternative<bool>(object))
     {
         return std::get<bool>(object) ? "true" : "false";
+    }
+    if (std::holds_alternative<LoxCallable *>(object))
+    {
+        return "function";
     }
     return std::get<std::string>(object);
 }

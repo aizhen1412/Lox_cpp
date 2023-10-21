@@ -24,17 +24,26 @@ private:
 
     Stmt *printStatement();
     Stmt *varDeclaration();
+    Stmt *whileStatement();
     Stmt *expressionStatement();
+    Function *function(std::string kind);
     std::vector<Stmt *> block();
 
     Expr *assignment();
+    Expr *or_me();
+    Expr *and_me();
     Stmt *statement();
+    Stmt *returnStatement();
+    Stmt *forStatement();
+    Stmt *ifStatement();
     Stmt *declaration();
     Expr *Equality();
     Expr *Comparison();
     Expr *Term();
     Expr *Factor();
     Expr *Unary();
+    Expr *finishCall(Expr *callee);
+    Expr *call();
     Expr *Primary();
 
     template <typename... Args>
