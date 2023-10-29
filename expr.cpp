@@ -1,5 +1,5 @@
 #include "expr.h"
-
+#include <iostream>
 Assign::Assign(Token name, Expr *value) : name(name), value(value) {}
 Object Assign::Accept(Visitor &visitor)
 {
@@ -58,5 +58,5 @@ Object Unary::Accept(Visitor &visitor)
 Variable::Variable(Token name) : name(name) {}
 Object Variable::Accept(Visitor &visitor)
 {
-    return visitor.VisitVariable(*this);
+    return visitor.VisitVariable(this);
 }

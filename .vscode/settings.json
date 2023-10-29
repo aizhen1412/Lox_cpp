@@ -72,6 +72,10 @@
         "xlocbuf": "cpp",
         "xlocmes": "cpp",
         "xlocmon": "cpp",
-        "xloctime": "cpp"
+        "xloctime": "cpp",
+        "deque": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "stack": "cpp"
     }
 }

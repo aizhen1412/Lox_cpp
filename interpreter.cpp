@@ -44,9 +44,24 @@ Object Interpreter::VisitUnary(Unary &expr)
     // Unreachable.
     return nullptr;
 }
-Object Interpreter::VisitVariable(Variable &expr)
+Object Interpreter::VisitVariable(Variable *expr)
 {
-    return environment->get(expr.name); // retbool
+    // return environment->get(expr.name); // retbool
+    return lookUpVariable(expr->name, expr);
+}
+Object Interpreter::lookUpVariable(Token name, Expr *expr)
+{
+    auto ret = locals.find(expr);
+    if (ret != locals.end())
+    {
+        int distance = ret->second; // 0
+
+        return environment->getAt(distance, name.lexeme);
+    }
+    else
+    {
+        return globals->get(name);
+    }
 }
 Object Interpreter::VisitGrouping(Grouping &expr)
 {
@@ -182,11 +197,16 @@ bool Interpreter::IsEqual(Object a, Object b)
 
 Object Interpreter::Evaluate(Expr *expr)
 {
+
     return expr->Accept(*this);
 }
 void Interpreter::execute(Stmt *stmt)
 {
     stmt->accept(*this);
+}
+void Interpreter::resolve(Expr *expr, int depth)
+{
+    locals[expr] = depth;
 }
 void Interpreter::executeBlock(std::vector<Stmt *> statements, Environment *environment)
 {
@@ -269,10 +289,20 @@ Object Interpreter::visitWhileStmt(While &stmt)
     }
     return nullptr;
 }
-Object Interpreter::VisitAssignExpr(Assign &expr)
+Object Interpreter::VisitAssignExpr(Assign *expr)
 {
-    Object value = Evaluate(expr.value);
-    environment->assign(expr.name, value);
+    Object value = Evaluate(expr->value);
+    auto ret = locals.find(expr);
+    if (ret != locals.end())
+    {
+        int distance = ret->second;
+        environment->assignAt(distance, expr->name, value);
+    }
+    else
+    {
+        globals->assign(expr->name, value);
+    }
+
     return value;
 }
 void Interpreter::Interpret(std::vector<Stmt *> statements)

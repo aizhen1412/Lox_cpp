@@ -54,7 +54,7 @@ public:
   virtual Object VisitSuper(Super &Expr) = 0;
   virtual Object VisitThis(This &Expr) = 0;
   virtual Object VisitUnary(Unary &Expr) = 0;
-  virtual Object VisitVariable(Variable &Expr) = 0;
+  virtual Object VisitVariable(Variable *Expr) = 0;
   virtual Object visitBlockStmt(Block &stmt) = 0;
   virtual Object visitClassStmt(Class &stmt) = 0;
   virtual Object visitExpressionStmt(Expression &stmt) = 0;

@@ -8,6 +8,7 @@
 #include "error.h"
 #include "parser.h"
 #include "interpreter.h"
+#include "resolver.h"
 
 void Lox::RunFile(const std::string &filePath) // 从文件中读取源代码
 {
@@ -66,6 +67,10 @@ void Lox::Run(const std::string &source) // 运行源代码
 
         Interpreter interpreter;
 
+        Resolver resolver(&interpreter);
+        resolver.resolve(statements);
+        // if (had_error)
+        //     return;
         interpreter.Interpret(statements);
     }
     catch (const Parser::ParseError &error)
