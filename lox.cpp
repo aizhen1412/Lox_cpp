@@ -10,19 +10,19 @@
 #include "interpreter.h"
 #include "resolver.h"
 
-void Lox::RunFile(const std::string &filePath) // 从文件中读取源代码
+void Lox::RunFile(const std::string &filePath)
 {
-    std::ifstream file(filePath); // 打开文件
-    if (!file.is_open())          // 判断文件是否打开成功
+    std::ifstream file(filePath);
+    if (!file.is_open())
     {
         std::cerr << "Error opening file: " << filePath << std::endl;
         exit(1);
     }
 
-    std::stringstream buffer; // 缓冲区
-    buffer << file.rdbuf();   // 读取文件内容到缓冲区
+    std::stringstream buffer;
+    buffer << file.rdbuf();
     Run(buffer.str());
-    if (had_error) // 如果有错误，退出程序
+    if (had_error)
         exit(65);
 }
 
@@ -64,11 +64,14 @@ void Lox::Run(const std::string &source) // 运行源代码
         // }
         if (hadRuntimeError)
             return;
+        // Interpreter interpreter = Interpreter();
+        // interpreter.Interpret(statements);
+        Interpreter interpreter = Interpreter();
 
-        Interpreter interpreter;
+        Resolver resolver = Resolver(&interpreter);
 
-        Resolver resolver(&interpreter);
         resolver.resolve(statements);
+        //   resolver.test();
         // if (had_error)
         //     return;
         interpreter.Interpret(statements);

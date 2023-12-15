@@ -1,5 +1,9 @@
 #include "expr.h"
 #include <iostream>
+#include <typeinfo>
+#include "interpreter.h" //
+#include "resolver.h"
+
 Assign::Assign(Token name, Expr *value) : name(name), value(value) {}
 Object Assign::Accept(Visitor &visitor)
 {

@@ -6,7 +6,10 @@
 #include "token_type_functions.h"
 
 class LoxCallable;
-#define Object std::variant<double, bool, std::string, std::nullptr_t, LoxCallable *>
+class LoxClass;
+class LoxInstance;
+
+#define Object std::variant<double, bool, std::string, std::nullptr_t, LoxCallable *, LoxClass *, LoxInstance *>
 
 class Token
 {

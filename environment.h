@@ -17,7 +17,7 @@ public:
     void assignAt(int distance, Token name, Object value);
     Environment *ancestor(int distance);
 
-private:
+
     Environment *enclosing;
     std::unordered_map<std::string, Object> values;
 };

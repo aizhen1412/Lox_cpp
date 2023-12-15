@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "token.h"
-
+#include <iostream>
 class Visitor;
 class Assign;
 class Binary;
@@ -43,6 +43,7 @@ public:
 class Visitor
 {
 public:
+  // virtual void test() = 0;
   virtual Object VisitAssignExpr(Assign &Expr) = 0;
   virtual Object VisitBinary(Binary &Expr) = 0;
   virtual Object VisitCall(Call &Expr) = 0;
@@ -233,13 +234,13 @@ public:
   Function() = default;
   Function(Token name, std::vector<Token> &params, std::vector<Stmt *> &body) : name(name), params(params), body(body) {}
 
-  virtual ~Function()
-  {
-    for (auto stmt : body)
-    {
-      delete stmt;
-    }
-  }
+  // virtual ~Function()
+  // {
+  //   for (auto stmt : body)
+  //   {
+  //     delete stmt;
+  //   }
+  // }
 
   Object accept(Visitor &visitor) override
   {

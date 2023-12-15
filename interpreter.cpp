@@ -6,6 +6,8 @@
 #include "lox_function.h"
 #include <variant>
 #include "return_method.h"
+#include "lox_class.h"
+#include "lox_instance.h"
 
 Object Interpreter::VisitLiteral(Literal &expr)
 {
@@ -27,6 +29,45 @@ Object Interpreter::VisitLogical(Logical &expr)
     }
 
     return Evaluate(expr.right);
+}
+Object Interpreter::VisitGet(Get &expr)
+{
+    Object object = Evaluate(expr.object);
+    if (std::holds_alternative<LoxInstance *>(object))
+    {
+        return ((std::get<LoxInstance *>(object))->get(expr.name));
+    }
+    if (std::holds_alternative<std::nullptr_t>(object))
+    {
+        std::cout << "err" << std::endl;
+    }
+    throw new RuntimeError(expr.name,
+                           "Only instances have properties.");
+}
+Object Interpreter::VisitSet(Set &expr)
+{
+    //  std::cout << "set" << expr.value << std::endl;
+
+    Object object = Evaluate(expr.object); // right
+    //   Object object = Evaluate(expr.value); // test
+
+    // if ((std::holds_alternative<double>(object)))
+    // {
+    //     std::cout << std::get<double>(object) << std::endl;
+    // }
+    if (!(std::holds_alternative<LoxInstance *>(object)))
+    {
+        throw new RuntimeError(expr.name,
+                               "Only instances have fields.");
+    }
+
+    Object value = Evaluate(expr.value);
+    (std::get<LoxInstance *>(object))->set(expr.name, value);
+    return value;
+}
+Object Interpreter::VisitThis(This &expr)
+{
+    return lookUpVariable(expr.keyword, &expr);
 }
 Object Interpreter::VisitUnary(Unary &expr)
 {
@@ -51,12 +92,21 @@ Object Interpreter::VisitVariable(Variable *expr)
 }
 Object Interpreter::lookUpVariable(Token name, Expr *expr)
 {
+    // 打印locals
+    // int i = 0;
+    // for (auto it = this->locals.begin(); it != this->locals.end(); it++)
+    // {
+    //     std::cout << expr << std::endl;
+    //     std::cout << "it->first:" << it->first << std::endl;
+    //     std::cout << "it->second:" << it->second << std::endl;
+    //     std::cout << "        " << std::endl;
+    // }
     auto ret = locals.find(expr);
     if (ret != locals.end())
     {
-        int distance = ret->second; // 0
-
-        return environment->getAt(distance, name.lexeme);
+        int distance = ret->second;
+        //   std::cout << "distance" << distance << std::endl;
+        return environment->getAt(distance, name.lexeme); //
     }
     else
     {
@@ -126,18 +176,36 @@ Object Interpreter::VisitCall(Call &expr)
     {
         arguments_.push_back(Evaluate(argument));
     }
+    if ((std::holds_alternative<LoxClass *>(callee)))
+    {
+        LoxCallable *temp = static_cast<LoxCallable *>(std::get<LoxClass *>(callee));
+        callee = temp;
+        if (!(std::holds_alternative<LoxCallable *>(callee)))
+        {
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+        }
+        LoxCallable *function = std::get<LoxCallable *>(callee);
+        if (arguments_.size() != function->arity())
+        {
+            throw new RuntimeError(expr.paren, "Expected " + std::to_string(function->arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
+        }
 
-    if (!(std::holds_alternative<LoxCallable *>(callee)))
-    {
-        throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+        return function->call(this, arguments_);
     }
-    LoxCallable *function = std::get<LoxCallable *>(callee);
-    if (arguments_.size() != function->arity())
+    else
     {
-        throw new RuntimeError(expr.paren, "Expected " + std::to_string(function->arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
+        if (!(std::holds_alternative<LoxCallable *>(callee)))
+        {
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+        }
+        LoxCallable *function = std::get<LoxCallable *>(callee);
+        if (arguments_.size() != function->arity())
+        {
+            throw new RuntimeError(expr.paren, "Expected " + std::to_string(function->arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
+        }
+        LoxFunction *loxFunction = dynamic_cast<LoxFunction *>(function);
+        return loxFunction->call(this, arguments_);
     }
-    LoxFunction *loxFunction = dynamic_cast<LoxFunction *>(function);
-    return loxFunction->call(this, arguments_);
 }
 void Interpreter::CheckNumberOperand(Token op, Object operand) // 检查操作数是否为数字
 {
@@ -197,7 +265,6 @@ bool Interpreter::IsEqual(Object a, Object b)
 
 Object Interpreter::Evaluate(Expr *expr)
 {
-
     return expr->Accept(*this);
 }
 void Interpreter::execute(Stmt *stmt)
@@ -215,7 +282,6 @@ void Interpreter::executeBlock(std::vector<Stmt *> statements, Environment *envi
     // {
     this->environment = environment; // 切换环境
     for (auto statement : statements)
-
     {
         execute(statement);
     }
@@ -228,6 +294,43 @@ Object Interpreter::visitBlockStmt(Block &stmt)
 
     return nullptr;
 }
+Object Interpreter::visitClassStmt(Class &stmt)
+{
+    Object superclass = nullptr;
+    if (stmt.superclass != nullptr) // here is nullptr
+    {
+        superclass = Evaluate(stmt.superclass);
+        if (!(std::holds_alternative<LoxClass *>(superclass)))
+        {
+            throw new RuntimeError(stmt.superclass->name, "Superclass must be a class.");
+        }
+    }
+    environment->define(stmt.name.lexeme, nullptr);
+    if (stmt.superclass != nullptr)
+    {
+        environment = new Environment(environment);
+        environment->define("super", superclass);
+    }
+    std::unordered_map<std::string, LoxFunction *> methods;
+    for (Function *method : stmt.methods)
+    {
+        LoxFunction *function = new LoxFunction(*method, environment, (method->name.lexeme.compare("init") == 0));
+        methods[method->name.lexeme] = function;
+    }
+
+    if ((std::holds_alternative<std::nullptr_t>(superclass)))
+    {
+        std::cout << "superclass == null" << std::endl;
+    }
+    LoxClass *klass = new LoxClass(stmt.name.lexeme, std::get<LoxClass *>(superclass), methods);
+
+    if (!(std::holds_alternative<std::nullptr_t>(superclass))) // superclass != null
+    {
+        environment = environment->enclosing;
+    }
+    environment->assign(stmt.name, klass);
+    return nullptr;
+}
 Object Interpreter::visitExpressionStmt(Expression &stmt)
 {
     Evaluate(stmt.expression);
@@ -235,7 +338,8 @@ Object Interpreter::visitExpressionStmt(Expression &stmt)
 }
 Object Interpreter::visitFunctionStmt(Function &stmt)
 {
-    LoxFunction *function = new LoxFunction(stmt, environment);
+    LoxFunction *function = new LoxFunction(stmt, environment, false);
+
     LoxCallable *callable = function;
     environment->define(stmt.name.lexeme, callable);
     return nullptr;
@@ -255,6 +359,7 @@ Object Interpreter::visitIfStmt(If &stmt)
 Object Interpreter::visitPrintStmt(Print &stmt)
 {
     Object value = Evaluate(stmt.expression);
+    // 第三次
     std::cout << Stringify(value) << std::endl;
     return nullptr;
 }
@@ -307,17 +412,6 @@ Object Interpreter::VisitAssignExpr(Assign *expr)
 }
 void Interpreter::Interpret(std::vector<Stmt *> statements)
 {
-    // Object value = Evaluate(expression);
-    // std::cout << Stringify(value) << std::endl;
-    // try
-    // {
-    //     Object value = Evaluate(expression);
-    //     std::cout << Stringify(value) << std::endl;
-    // }
-    // catch (const RuntimeError &error)
-    // {
-    //     Error::RuntimeError(error);
-    // }
     try
     {
         for (const auto &statement : statements)
@@ -336,7 +430,7 @@ std::string Interpreter::Stringify(Object object)
     if (std::holds_alternative<std::nullptr_t>(object))
         return "nil";
 
-    if (std::holds_alternative<double>(object))
+    else if (std::holds_alternative<double>(object))
     {
         std::string text = std::to_string(std::get<double>(object));
         // Remove ".0" from integer-valued Doubles.
@@ -347,13 +441,25 @@ std::string Interpreter::Stringify(Object object)
 
         return text;
     }
-    if (std::holds_alternative<bool>(object))
+    else if (std::holds_alternative<bool>(object))
     {
         return std::get<bool>(object) ? "true" : "false";
     }
-    if (std::holds_alternative<LoxCallable *>(object))
+    else if (std::holds_alternative<LoxCallable *>(object))
     {
         return "function";
     }
-    return std::get<std::string>(object);
+    else if (std::holds_alternative<LoxClass *>(object))
+    {
+        LoxClass *klass = std::get<LoxClass *>(object);
+        return klass->toString();
+    }
+    else if (std::holds_alternative<LoxInstance *>(object))
+    {
+        LoxInstance *klass = std::get<LoxInstance *>(object);
+        return klass->toString();
+    }
+
+    else
+        return std::get<std::string>(object);
 }

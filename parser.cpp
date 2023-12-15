@@ -118,11 +118,15 @@ Expr *Parser::assignment()
             Token name = variableExpr->name;
             return new Assign(name, value);
         }
+        else if (auto getExpr = dynamic_cast<Get *>(expr))
+        {
+            // Get get = (Get)getExpr;
+            return new Set(getExpr->object, getExpr->name, value);
 
-        error(equals, "Invalid assignment target.");
-    }
-
-    return expr;
+            error(equals, "Invalid assignment target.");
+        }
+    }            // return expr;
+    return expr; //}这样是错的，搞了我三天没找到!!!
 }
 Expr *Parser::or_me()
 {
@@ -247,6 +251,8 @@ Stmt *Parser::declaration()
 {
     try
     {
+        if (Match(CLASS))
+            return classDeclaration();
         if (Match(FUN))
             return function("function");
         if (Match(VAR))
@@ -259,6 +265,25 @@ Stmt *Parser::declaration()
         // synchronize();
         return nullptr;
     }
+}
+Stmt *Parser::classDeclaration()
+{
+    Token name = Consume(IDENTIFIER, "Expect class name.");
+    Variable *superclass = nullptr;
+    if (Match(LESS))
+    {
+        Consume(IDENTIFIER, "Expect superclass name.");
+        superclass = new Variable(Previous());
+    }
+    Consume(LEFT_BRACE, "Expect '{' before class body.");
+    std::vector<Function *> methods;
+    while (!Check(RIGHT_BRACE) && !IsAtEnd())
+    {
+        methods.push_back(function("method"));
+    }
+    Consume(RIGHT_BRACE, "Expect '}' after class body.");
+
+    return new Class(name, superclass, methods);
 }
 Expr *Parser::Equality()
 {
@@ -356,6 +381,11 @@ Expr *Parser::call()
         {
             expr = finishCall(expr);
         }
+        else if (Match(DOT))
+        {
+            Token name = Consume(IDENTIFIER, "Expect property name after '.'.");
+            expr = new Get(expr, name);
+        }
         else
         {
             break;
@@ -372,11 +402,20 @@ Expr *Parser::Primary()
         return new Literal(true);
     if (Match(NIL))
         return new Literal(nullptr);
-
     if (Match(NUMBER, STRING))
     {
         return new Literal(Previous().literal);
     }
+    if (Match(SUPER))
+    {
+        Token keyword = Previous();
+        Consume(DOT, "Expect '.' after 'super'.");
+        Token method = Consume(IDENTIFIER,
+                               "Expect superclass method name.");
+        return new Super(keyword, method);
+    }
+    if (Match(THIS))
+        return new This(Previous());
     if (Match(IDENTIFIER))
     {
         return new Variable(Previous());

@@ -37,6 +37,7 @@ private:
     Stmt *forStatement();
     Stmt *ifStatement();
     Stmt *declaration();
+    Stmt *classDeclaration();
     Expr *Equality();
     Expr *Comparison();
     Expr *Term();
