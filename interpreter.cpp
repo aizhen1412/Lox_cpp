@@ -105,7 +105,7 @@ Object Interpreter::lookUpVariable(Token name, Expr *expr)
     if (ret != locals.end())
     {
         int distance = ret->second;
-        //   std::cout << "distance" << distance << std::endl;
+        std::cout << "distance" << distance << std::endl;
         return environment->getAt(distance, name.lexeme); //
     }
     else
