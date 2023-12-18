@@ -65,11 +65,7 @@ public:
     Object visitReturnStmt(Return &stmt);
     Object visitVarStmt(Var &stmt) override;
     Object visitWhileStmt(While &stmt) override;
-    Object VisitAssignExpr(Assign *expr);
-    Object VisitAssignExpr(Assign &expr)
-    {
-        return nullptr;
-    }
+    Object VisitAssignExpr(Assign &expr);
 
     void Interpret(std::vector<Stmt *> statements);
     std::string Stringify(Object object);

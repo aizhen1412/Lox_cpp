@@ -1,3 +1,14 @@
-for (var i = 0; i < 5; i = i + 1) {
-  print i;
+class Animal {
+  speak() {
+    print "This animal makes a sound.";
+  }
 }
+
+class Dog < Animal {
+  speak() {
+    print "Woof!";
+  }
+}
+
+var myDog = Dog();
+myDog.speak();  // 输出"Woof!"

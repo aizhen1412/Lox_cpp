@@ -431,18 +431,18 @@ Object Interpreter::visitWhileStmt(While &stmt)
     }
     return nullptr;
 }
-Object Interpreter::VisitAssignExpr(Assign *expr)
+Object Interpreter::VisitAssignExpr(Assign &expr)
 {
-    Object value = Evaluate(expr->value);
-    auto ret = locals.find(expr);
+    Object value = Evaluate(expr.value);
+    auto ret = locals.find(&expr);
     if (ret != locals.end())
     {
         int distance = ret->second;
-        environment->assignAt(distance, expr->name, value);
+        environment->assignAt(distance, expr.name, value);
     }
     else
     {
-        globals->assign(expr->name, value);
+        globals->assign(expr.name, value);
     }
 
     return value;
