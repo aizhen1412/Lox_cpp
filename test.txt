@@ -1,23 +1,15 @@
-//class A {
-//  method() {
-//    print "A method";
-//  }
-//}
-//
+//class A {  method() {    print "A method";  }}var a = A();a.method(); // prints "A method"
+
 //class B < A {
 //  method() {
 //    print "B method";
 //  }
 //}
-fun fib(n){
-    if (n < 2)
-    {
-        return n;
-    }
-    print n;
-    print fib(n - 1);
-    print n;
-    print fib(n - 2);
-    print n;
+
+class Breakfast {
+  cook() {
+    print "Cooking breakfast...";
+  }
 }
-fib(2);
+var myBreakfast = Breakfast();
+myBreakfast.cook();  // 输出 "Cooking breakfast..."

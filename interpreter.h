@@ -13,10 +13,16 @@
 class Interpreter : public Visitor // 后面换成visitor
 {
 public:
+    int count = 0;
     Interpreter()
     {
         //  globals->define("clock", new LoxCallable());
     }
+  //  Environment *previous = nullptr;
+    // void test()
+    // {
+    //     std::cout << "environment" << environment << std::endl;
+    // }
     Object VisitGet(Get &Expr) override;
 
     Object VisitSuper(Super &Expr) { return "super"; };

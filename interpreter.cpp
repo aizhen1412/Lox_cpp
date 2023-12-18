@@ -105,11 +105,12 @@ Object Interpreter::lookUpVariable(Token name, Expr *expr)
     if (ret != locals.end())
     {
         int distance = ret->second;
-        std::cout << "distance" << distance << std::endl;
+        // std::cout << "distance" << distance << std::endl;
         return environment->getAt(distance, name.lexeme); //
     }
     else
     {
+        // std::cout << "globals" << std::endl;
         return globals->get(name);
     }
 }
@@ -121,7 +122,9 @@ Object Interpreter::VisitGrouping(Grouping &expr)
 Object Interpreter::VisitBinary(Binary &expr)
 {
     Object left = Evaluate(expr.left);
+    //  std::cout << "left" << std::get<double>(left) << std::endl;
     Object right = Evaluate(expr.right);
+    // std::cout << "right" << std::get<double>(right) << std::endl;
 
     switch (expr.op.type)
     {
@@ -199,7 +202,7 @@ Object Interpreter::VisitCall(Call &expr)
             throw new RuntimeError(expr.paren, "Can only call functions and classes.");
         }
         LoxCallable *function = std::get<LoxCallable *>(callee);
-        if (arguments_.size() != function->arity())
+        if (arguments_.size() != function->arity()) // arity() 返回函数的参数个数
         {
             throw new RuntimeError(expr.paren, "Expected " + std::to_string(function->arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
         }
@@ -277,16 +280,32 @@ void Interpreter::resolve(Expr *expr, int depth)
 }
 void Interpreter::executeBlock(std::vector<Stmt *> statements, Environment *environment)
 {
+    // std::cout << "call executeBlock " << std::endl;
     Environment *previous = this->environment;
-    // try
-    // {
-    this->environment = environment; // 切换环境
-    for (auto statement : statements)
+    // std::cout << "first" << std::get<double>(previous->values["n"]) << std::endl;
+    try
     {
-        execute(statement);
+        this->environment = environment; // 切换环境
+        for (auto statement : statements)
+        {
+            // std::cout << "environment->values[\" n \"] " << std::get<double>(environment->values["n"]) << std::endl;
+            // test();
+            execute(statement);
+        }
     }
-    this->environment = previous;
-    // }
+    catch (const Return_method &returnValue)
+    {
+        this->environment = previous;
+        //  std::cout << "call recover " << std::endl;
+        throw returnValue;
+        return;
+    }
+    this->environment = previous; // 抛出return后这里不会执行
+
+    // std::cout << "call recover " << std::endl;
+    // std::cout << "after throw  " << std::endl;
+    // test();
+    // std::cout << "second" << std::get<double>(environment->values["n"]) << std::endl;
 }
 Object Interpreter::visitBlockStmt(Block &stmt)
 {
@@ -300,6 +319,10 @@ Object Interpreter::visitClassStmt(Class &stmt)
     if (stmt.superclass != nullptr) // here is nullptr
     {
         superclass = Evaluate(stmt.superclass);
+        if ((std::holds_alternative<std::nullptr_t>(superclass)))
+        {
+            std::cout << "superclass == null" << std::endl;
+        }
         if (!(std::holds_alternative<LoxClass *>(superclass)))
         {
             throw new RuntimeError(stmt.superclass->name, "Superclass must be a class.");
@@ -370,7 +393,7 @@ Object Interpreter::visitReturnStmt(Return &stmt)
     {
         value = Evaluate(stmt.value);
     }
-
+    //  std::cout << "call return " << std::endl;
     throw Return_method(value);
 
     return nullptr;
@@ -434,11 +457,26 @@ std::string Interpreter::Stringify(Object object)
     {
         std::string text = std::to_string(std::get<double>(object));
         // Remove ".0" from integer-valued Doubles.
-        if (text.length() >= 2 && text.substr(text.length() - 2) == ".0")
-        {
-            text = text.substr(0, text.length() - 2);
-        }
+        // if (text.length() >= 2 && text.substr(text.length() - 2) == ".0")
+        // {
+        //     text = text.substr(0, text.length() - 2);
+        // }
 
+        size_t dotPosition = text.find('.');
+        if (dotPosition != std::string::npos)
+        {
+            size_t lastNonZero = text.find_last_not_of('0');
+            if (lastNonZero == dotPosition)
+            {
+                // The decimal point is the last non-zero character
+                return text.substr(0, dotPosition);
+            }
+            else
+            {
+                // Remove trailing zeros after the decimal point
+                return text.substr(0, lastNonZero + 1);
+            }
+        }
         return text;
     }
     else if (std::holds_alternative<bool>(object))
