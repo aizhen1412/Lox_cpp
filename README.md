@@ -20,6 +20,8 @@ Lox是一门简单但功能齐全的编程语言，用于教育目的。它是�
 
 - [Crafting Interpreters](https://craftinginterpreters.com/)：这本书是Lox解释器和编译器的作者Robert Nystrom编写的，它提供了深入的关于Lox的解释和实现细节的教育材料。
 
+中文翻译可参考https://github.com/izackwu/TeachYourselfCS-CN
+
 ## 如何贡献
 
 如果你对这个项目感兴趣，欢迎贡献代码、报告问题或提出建议。请参阅贡献指南以获取更多信息。
