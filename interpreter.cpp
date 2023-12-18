@@ -9,25 +9,25 @@
 #include "lox_class.h"
 #include "lox_instance.h"
 
-Object Interpreter::VisitSuper(Super &Expr)
+Object Interpreter::VisitSuperExpr(Super &Expr)
 {
     int distance = locals[&Expr];
-    LoxClass *superclass = std::get<LoxClass *>(environment->getAt(distance, "super"));
-    LoxInstance *object = std::get<LoxInstance *>(environment->getAt(distance - 1, "this"));
-    LoxFunction *method = superclass->findMethod(Expr.method.lexeme);
+    LoxClass *superclass = std::get<LoxClass *>(environment->GetAt(distance, "super"));
+    LoxInstance *object = std::get<LoxInstance *>(environment->GetAt(distance - 1, "this"));
+    LoxFunction *method = superclass->FindMethod(Expr.method.lexeme);
     if (method == nullptr)
     {
         throw new RuntimeError(Expr.method,
                                "Undefined property '" + Expr.method.lexeme + "'.");
     }
 
-    return method->bind(object);
+    return method->Bind(object);
 }
-Object Interpreter::VisitLiteral(Literal &expr)
+Object Interpreter::VisitLiteralExpr(Literal &expr)
 {
     return expr.value;
 }
-Object Interpreter::VisitLogical(Logical &expr)
+Object Interpreter::VisitLogicalExpr(Logical &expr)
 {
     Object left = Evaluate(expr.left);
 
@@ -44,12 +44,12 @@ Object Interpreter::VisitLogical(Logical &expr)
 
     return Evaluate(expr.right);
 }
-Object Interpreter::VisitGet(Get &expr)
+Object Interpreter::VisitGetExpr(Get &expr)
 {
     Object object = Evaluate(expr.object);
     if (std::holds_alternative<LoxInstance *>(object))
     {
-        return ((std::get<LoxInstance *>(object))->get(expr.name));
+        return ((std::get<LoxInstance *>(object))->Get(expr.name));
     }
     if (std::holds_alternative<std::nullptr_t>(object))
     {
@@ -58,7 +58,7 @@ Object Interpreter::VisitGet(Get &expr)
     throw new RuntimeError(expr.name,
                            "Only instances have properties.");
 }
-Object Interpreter::VisitSet(Set &expr)
+Object Interpreter::VisitSetExpr(Set &expr)
 {
     //  std::cout << "set" << expr.value << std::endl;
 
@@ -76,14 +76,14 @@ Object Interpreter::VisitSet(Set &expr)
     }
 
     Object value = Evaluate(expr.value);
-    (std::get<LoxInstance *>(object))->set(expr.name, value);
+    (std::get<LoxInstance *>(object))->Set(expr.name, value);
     return value;
 }
-Object Interpreter::VisitThis(This &expr)
+Object Interpreter::VisitThisExpr(This &expr)
 {
-    return lookUpVariable(expr.keyword, &expr);
+    return LookUpVariable(expr.keyword, &expr);
 }
-Object Interpreter::VisitUnary(Unary &expr)
+Object Interpreter::VisitUnaryExpr(Unary &expr)
 {
     Object right = Evaluate(expr.right);
 
@@ -99,12 +99,12 @@ Object Interpreter::VisitUnary(Unary &expr)
     // Unreachable.
     return nullptr;
 }
-Object Interpreter::VisitVariable(Variable *expr)
+Object Interpreter::VisitVariableExpr(Variable *expr)
 {
     // return environment->get(expr.name); // retbool
-    return lookUpVariable(expr->name, expr);
+    return LookUpVariable(expr->name, expr);
 }
-Object Interpreter::lookUpVariable(Token name, Expr *expr)
+Object Interpreter::LookUpVariable(Token name, Expr *expr)
 {
     // 打印locals
     // int i = 0;
@@ -120,7 +120,7 @@ Object Interpreter::lookUpVariable(Token name, Expr *expr)
     {
         int distance = ret->second;
         // std::cout << "distance" << distance << std::endl;
-        return environment->getAt(distance, name.lexeme); //
+        return environment->GetAt(distance, name.lexeme); //
     }
     else
     {
@@ -128,12 +128,12 @@ Object Interpreter::lookUpVariable(Token name, Expr *expr)
         return globals->get(name);
     }
 }
-Object Interpreter::VisitGrouping(Grouping &expr)
+Object Interpreter::VisitGroupingExpr(Grouping &expr)
 {
     return Evaluate(expr.expression);
 }
 
-Object Interpreter::VisitBinary(Binary &expr)
+Object Interpreter::VisitBinaryExpr(Binary &expr)
 {
     Object left = Evaluate(expr.left);
     //  std::cout << "left" << std::get<double>(left) << std::endl;
@@ -184,7 +184,7 @@ Object Interpreter::VisitBinary(Binary &expr)
     // Unreachable.
     return nullptr;
 }
-Object Interpreter::VisitCall(Call &expr)
+Object Interpreter::VisitCallExpr(Call &expr)
 {
     Object callee = Evaluate(expr.callee); // bool
 
@@ -202,12 +202,12 @@ Object Interpreter::VisitCall(Call &expr)
             throw new RuntimeError(expr.paren, "Can only call functions and classes.");
         }
         LoxCallable *function = std::get<LoxCallable *>(callee);
-        if (arguments_.size() != function->arity())
+        if (arguments_.size() != function->Arity())
         {
-            throw new RuntimeError(expr.paren, "Expected " + std::to_string(function->arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
+            throw new RuntimeError(expr.paren, "Expected " + std::to_string(function->Arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
         }
 
-        return function->call(this, arguments_);
+        return function->Call(this, arguments_);
     }
     else
     {
@@ -216,12 +216,12 @@ Object Interpreter::VisitCall(Call &expr)
             throw new RuntimeError(expr.paren, "Can only call functions and classes.");
         }
         LoxCallable *function = std::get<LoxCallable *>(callee);
-        if (arguments_.size() != function->arity()) // arity() 返回函数的参数个数
+        if (arguments_.size() != function->Arity()) // arity() 返回函数的参数个数
         {
-            throw new RuntimeError(expr.paren, "Expected " + std::to_string(function->arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
+            throw new RuntimeError(expr.paren, "Expected " + std::to_string(function->Arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
         }
         LoxFunction *loxFunction = dynamic_cast<LoxFunction *>(function);
-        return loxFunction->call(this, arguments_);
+        return loxFunction->Call(this, arguments_);
     }
 }
 void Interpreter::CheckNumberOperand(Token op, Object operand) // 检查操作数是否为数字
@@ -284,15 +284,15 @@ Object Interpreter::Evaluate(Expr *expr)
 {
     return expr->Accept(*this);
 }
-void Interpreter::execute(Stmt *stmt)
+void Interpreter::Execute(Stmt *stmt)
 {
-    stmt->accept(*this);
+    stmt->Accept(*this);
 }
-void Interpreter::resolve(Expr *expr, int depth)
+void Interpreter::Resolve(Expr *expr, int depth)
 {
     locals[expr] = depth;
 }
-void Interpreter::executeBlock(std::vector<Stmt *> statements, Environment *environment)
+void Interpreter::ExecuteBlock(std::vector<Stmt *> statements, Environment *environment)
 {
     // std::cout << "call executeBlock " << std::endl;
     Environment *previous = this->environment;
@@ -304,7 +304,7 @@ void Interpreter::executeBlock(std::vector<Stmt *> statements, Environment *envi
         {
             // std::cout << "environment->values[\" n \"] " << std::get<double>(environment->values["n"]) << std::endl;
             // test();
-            execute(statement);
+            Execute(statement);
         }
     }
     catch (const Return_method &returnValue)
@@ -321,13 +321,13 @@ void Interpreter::executeBlock(std::vector<Stmt *> statements, Environment *envi
     // test();
     // std::cout << "second" << std::get<double>(environment->values["n"]) << std::endl;
 }
-Object Interpreter::visitBlockStmt(Block &stmt)
+Object Interpreter::VisitBlockStmt(Block &stmt)
 {
-    executeBlock(stmt.statements, new Environment(environment));
+    ExecuteBlock(stmt.statements, new Environment(environment));
 
     return nullptr;
 }
-Object Interpreter::visitClassStmt(Class &stmt)
+Object Interpreter::VisitClassStmt(Class &stmt)
 {
     Object superclass = nullptr;
     if (stmt.superclass != nullptr) // here is nullptr
@@ -342,11 +342,11 @@ Object Interpreter::visitClassStmt(Class &stmt)
             throw new RuntimeError(stmt.superclass->name, "Superclass must be a class.");
         }
     }
-    environment->define(stmt.name.lexeme, nullptr);
+    environment->Define(stmt.name.lexeme, nullptr);
     if (stmt.superclass != nullptr)
     {
         environment = new Environment(environment);
-        environment->define("super", superclass);
+        environment->Define("super", superclass);
     }
     std::unordered_map<std::string, LoxFunction *> methods;
     for (Function *method : stmt.methods)
@@ -365,42 +365,42 @@ Object Interpreter::visitClassStmt(Class &stmt)
     {
         environment = environment->enclosing;
     }
-    environment->assign(stmt.name, klass);
+    environment->Assign(stmt.name, klass);
     return nullptr;
 }
-Object Interpreter::visitExpressionStmt(Expression &stmt)
+Object Interpreter::VisitExpressionStmt(Expression &stmt)
 {
     Evaluate(stmt.expression);
     return nullptr;
 }
-Object Interpreter::visitFunctionStmt(Function &stmt)
+Object Interpreter::VisitFunctionStmt(Function &stmt)
 {
     LoxFunction *function = new LoxFunction(stmt, environment, false);
 
     LoxCallable *callable = function;
-    environment->define(stmt.name.lexeme, callable);
+    environment->Define(stmt.name.lexeme, callable);
     return nullptr;
 }
-Object Interpreter::visitIfStmt(If &stmt)
+Object Interpreter::VisitIfStmt(If &stmt)
 {
     if (IsTruthy(Evaluate(stmt.condition)))
     {
-        execute(stmt.thenBranch);
+        Execute(stmt.thenBranch);
     }
     else if (stmt.elseBranch != nullptr)
     {
-        execute(stmt.elseBranch);
+        Execute(stmt.elseBranch);
     }
     return nullptr;
 }
-Object Interpreter::visitPrintStmt(Print &stmt)
+Object Interpreter::VisitPrintStmt(Print &stmt)
 {
     Object value = Evaluate(stmt.expression);
     // 第三次
     std::cout << Stringify(value) << std::endl;
     return nullptr;
 }
-Object Interpreter::visitReturnStmt(Return &stmt)
+Object Interpreter::VisitReturnStmt(Return &stmt)
 {
     Object value = nullptr;
     if (stmt.value != nullptr)
@@ -412,7 +412,7 @@ Object Interpreter::visitReturnStmt(Return &stmt)
 
     return nullptr;
 }
-Object Interpreter::visitVarStmt(Var &stmt)
+Object Interpreter::VisitVarStmt(Var &stmt)
 {
     Object value = nullptr;
     if (stmt.initializer != nullptr)
@@ -420,14 +420,14 @@ Object Interpreter::visitVarStmt(Var &stmt)
         value = Evaluate(stmt.initializer);
     }
 
-    environment->define(stmt.name.lexeme, value);
+    environment->Define(stmt.name.lexeme, value);
     return nullptr;
 }
-Object Interpreter::visitWhileStmt(While &stmt)
+Object Interpreter::VisitWhileStmt(While &stmt)
 {
     while (IsTruthy(Evaluate(stmt.condition)))
     {
-        execute(stmt.body);
+        Execute(stmt.body);
     }
     return nullptr;
 }
@@ -438,11 +438,11 @@ Object Interpreter::VisitAssignExpr(Assign &expr)
     if (ret != locals.end())
     {
         int distance = ret->second;
-        environment->assignAt(distance, expr.name, value);
+        environment->AssignAt(distance, expr.name, value);
     }
     else
     {
-        globals->assign(expr.name, value);
+        globals->Assign(expr.name, value);
     }
 
     return value;
@@ -453,7 +453,7 @@ void Interpreter::Interpret(std::vector<Stmt *> statements)
     {
         for (const auto &statement : statements)
         {
-            execute(statement);
+            Execute(statement);
         }
     }
     catch (const RuntimeError &error)
@@ -504,12 +504,12 @@ std::string Interpreter::Stringify(Object object)
     else if (std::holds_alternative<LoxClass *>(object))
     {
         LoxClass *klass = std::get<LoxClass *>(object);
-        return klass->toString();
+        return klass->ToString();
     }
     else if (std::holds_alternative<LoxInstance *>(object))
     {
         LoxInstance *klass = std::get<LoxInstance *>(object);
-        return klass->toString();
+        return klass->ToString();
     }
 
     else

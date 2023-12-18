@@ -10,7 +10,7 @@ class Parser
 {
 public:
     Parser(std::vector<Token> tokens);
-    std::vector<Stmt *> parse();
+    std::vector<Stmt *> Parse();
 
     class ParseError
     {
@@ -20,38 +20,39 @@ private:
     int current = 0;
     std::vector<Token> tokens;
 
-    Expr *Expression_method();
+    Expr *ExpressionFun();
 
-    Stmt *printStatement();
-    Stmt *varDeclaration();
-    Stmt *whileStatement();
-    Stmt *expressionStatement();
-    Function *function(std::string kind);
-    std::vector<Stmt *> block();
+    Stmt *PrintStatement();
+    Stmt *VarDeclaration();
+    Stmt *WhileStatement();
+    Stmt *ExpressionStatement();
+    Function *FunctionMethod(std::string kind);
+    std::vector<Stmt *> BlockFun();
 
-    Expr *assignment();
-    Expr *or_me();
-    Expr *and_me();
-    Stmt *statement();
-    Stmt *returnStatement();
-    Stmt *forStatement();
-    Stmt *ifStatement();
-    Stmt *declaration();
-    Stmt *classDeclaration();
+    Expr *Assignment();
+    Expr *Or();
+    Expr *And();
+    Stmt *Statement();
+    Stmt *ReturnStatement();
+    Stmt *ForStatement();
+    Stmt *IfStatement();
+    Stmt *Declaration();
+    Stmt *ClassDeclaration();
     Expr *Equality();
     Expr *Comparison();
     Expr *Term();
     Expr *Factor();
-    Expr *Unary();
-    Expr *finishCall(Expr *callee);
-    Expr *call();
+    Expr *UnaryFun();
+    Expr *FinishCall(Expr *callee);
+
+    Expr *CallFun();
     Expr *Primary();
 
     template <typename... Args>
     bool Match(Args... types);
 
     Token Consume(TokenType type, std::string message);
-    ParseError error(Token token, std::string message);
+    ParseError Error(Token token, std::string message);
     void Synchronize();
     bool Check(TokenType type);
     Token Advance();

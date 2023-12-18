@@ -13,30 +13,14 @@ public:
     std::string name;
     LoxClass *superclass;
     std::unordered_map<std::string, LoxFunction *> methods;
+    LoxClass(std::string name, LoxClass *superclass, std::unordered_map<std::string, LoxFunction *> methods);
 
-    LoxClass(std::string name, LoxClass *superclass, std::unordered_map<std::string, LoxFunction *> methods)
-    {
-        this->superclass = superclass;
-        this->name = name;
-        this->methods = methods;
-    }
-    LoxFunction *findMethod(std::string name)
-    {
-        if (auto it = methods.find(name) != methods.end())
-        {
-            return methods[name];
-        }
-        if (superclass != nullptr)
-        {
-            return superclass->findMethod(name);
-        }
-        return nullptr;
-    }
-    std::string toString();
+    LoxFunction *FindMethod(std::string name);
+    std::string ToString();
 
-    Object call(Interpreter *interpreter, std::vector<Object> arguments) override;
+    Object Call(Interpreter *interpreter, std::vector<Object> arguments) override;
 
-    int arity() override;
+    int Arity() override;
 };
 
 #endif // LOXCLASS_H

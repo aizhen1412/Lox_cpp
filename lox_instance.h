@@ -10,14 +10,10 @@ public:
     LoxClass *klass;
 
     LoxInstance(LoxClass *klass);
-    Object get(Token name);
+    Object Get(Token name);
 
-    void set(Token name, Object value)
-    {
-        fields[name.lexeme] = value;
-    }
-
-    std::string toString();
+    void Set(Token name, Object value);
+    std::string ToString();
 
     std::unordered_map<std::string, Object> fields;
 };

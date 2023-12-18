@@ -7,19 +7,19 @@ Resolver::Resolver(Interpreter *interpreter)
 {
     this->interpreter = interpreter;
 }
-Object Resolver::visitBlockStmt(Block &stmt)
+Object Resolver::VisitBlockStmt(Block &stmt)
 {
-    beginScope();
-    resolve(stmt.statements);
-    endScope();
+    BeginScope();
+    Resolve(stmt.statements);
+    EndScope();
     return nullptr;
 }
-Object Resolver::visitClassStmt(Class &stmt)
+Object Resolver::VisitClassStmt(Class &stmt)
 {
     ClassType enclosingClass = currentClass;
     currentClass = ClassType::CLASS;
-    declare(stmt.name);
-    define(stmt.name);
+    Declare(stmt.name);
+    Define(stmt.name);
     if (stmt.superclass != nullptr && stmt.name.lexeme == stmt.superclass->name.lexeme)
     {
         Error::ErrorFind(stmt.superclass->name, "A class can't inherit from itself.");
@@ -27,14 +27,14 @@ Object Resolver::visitClassStmt(Class &stmt)
     if (stmt.superclass != nullptr)
     {
         currentClass = ClassType::SUBCLASS;
-        resolve(stmt.superclass);
+        Resolve(stmt.superclass);
     }
     if (stmt.superclass != nullptr)
     {
-        beginScope();
+        BeginScope();
         scopes.top()["super"] = true;
     }
-    beginScope();
+    BeginScope();
     scopes.top()["this"] = true;
     for (Function *method : stmt.methods)
     {
@@ -44,41 +44,41 @@ Object Resolver::visitClassStmt(Class &stmt)
             declaration = FunctionType::INITIALIZER;
         }
 
-        resolveFunction(method, declaration);
+        ResolveFunction(method, declaration);
     }
-    endScope();
+    EndScope();
     if (stmt.superclass != nullptr)
-        endScope();
+        EndScope();
     currentClass = enclosingClass;
     return nullptr;
 }
-Object Resolver::visitExpressionStmt(Expression &stmt)
+Object Resolver::VisitExpressionStmt(Expression &stmt)
 {
-    resolve(stmt.expression);
+    Resolve(stmt.expression);
     return nullptr;
 }
-Object Resolver::visitFunctionStmt(Function &stmt)
+Object Resolver::VisitFunctionStmt(Function &stmt)
 {
-    declare(stmt.name);
-    define(stmt.name);
-    resolveFunction(&stmt, FunctionType::FUNCTION);
+    Declare(stmt.name);
+    Define(stmt.name);
+    ResolveFunction(&stmt, FunctionType::FUNCTION);
     return nullptr;
 }
-Object Resolver::visitIfStmt(If &stmt)
+Object Resolver::VisitIfStmt(If &stmt)
 {
-    resolve(stmt.condition);
-    resolve(stmt.thenBranch);
+    Resolve(stmt.condition);
+    Resolve(stmt.thenBranch);
     if (stmt.elseBranch != nullptr)
-        resolve(stmt.elseBranch);
+        Resolve(stmt.elseBranch);
     return nullptr;
 }
-Object Resolver::visitPrintStmt(Print &stmt)
+Object Resolver::VisitPrintStmt(Print &stmt)
 {
-    resolve(stmt.expression);
+    Resolve(stmt.expression);
 
     return nullptr;
 }
-Object Resolver::visitReturnStmt(Return &stmt)
+Object Resolver::VisitReturnStmt(Return &stmt)
 {
     if (currentFunction == FunctionType::NONE)
     {
@@ -91,118 +91,118 @@ Object Resolver::visitReturnStmt(Return &stmt)
             Error::ErrorFind(stmt.keyword,
                              "Can't return a value from an initializer.");
         }
-        resolve(stmt.value);
+        Resolve(stmt.value);
     }
 
     return nullptr;
 }
-Object Resolver::visitVarStmt(Var &stmt)
+Object Resolver::VisitVarStmt(Var &stmt)
 {
-    declare(stmt.name);
+    Declare(stmt.name);
     if (stmt.initializer != nullptr)
     {
-        resolve(stmt.initializer);
+        Resolve(stmt.initializer);
     }
-    define(stmt.name);
+    Define(stmt.name);
     return nullptr;
 }
-Object Resolver::visitWhileStmt(While &stmt)
+Object Resolver::VisitWhileStmt(While &stmt)
 {
-    resolve(stmt.condition);
-    resolve(stmt.body);
+    Resolve(stmt.condition);
+    Resolve(stmt.body);
     return nullptr;
 }
 Object Resolver::VisitAssignExpr(Assign &expr)
 {
-    resolve(expr.value);
-    resolveLocal(&expr, expr.name);
+    Resolve(expr.value);
+    ResolveLocal(&expr, expr.name);
     return nullptr;
 }
-Object Resolver::VisitBinary(Binary &expr)
+Object Resolver::VisitBinaryExpr(Binary &expr)
 {
-    resolve(expr.left);
-    resolve(expr.right);
+    Resolve(expr.left);
+    Resolve(expr.right);
     return nullptr;
 }
-Object Resolver::VisitCall(Call &expr)
+Object Resolver::VisitCallExpr(Call &expr)
 {
-    resolve(expr.callee);
+    Resolve(expr.callee);
 
     for (Expr *argument : expr.arguments)
     {
-        resolve(argument);
+        Resolve(argument);
     }
 
     return nullptr;
 }
 
-Object Resolver::VisitGet(Get &expr)
+Object Resolver::VisitGetExpr(Get &expr)
 {
-    resolve(expr.object);
+    Resolve(expr.object);
     return nullptr;
 }
-Object Resolver::VisitGrouping(Grouping &expr)
+Object Resolver::VisitGroupingExpr(Grouping &expr)
 {
-    resolve(expr.expression);
+    Resolve(expr.expression);
     return nullptr;
 }
-Object Resolver::VisitLiteral(Literal &expr)
+Object Resolver::VisitLiteralExpr(Literal &expr)
 {
     return nullptr;
 }
-Object Resolver::VisitLogical(Logical &expr)
+Object Resolver::VisitLogicalExpr(Logical &expr)
 {
-    resolve(expr.left);
-    resolve(expr.right);
+    Resolve(expr.left);
+    Resolve(expr.right);
     return nullptr;
 }
-Object Resolver::VisitSet(Set &expr)
+Object Resolver::VisitSetExpr(Set &expr)
 {
-    resolve(expr.value);
-    resolve(expr.object);
+    Resolve(expr.value);
+    Resolve(expr.object);
     return nullptr;
 }
-Object Resolver::VisitThis(This &expr)
+Object Resolver::VisitThisExpr(This &expr)
 {
     if (currentClass == ClassType::NONE_CLASS)
     {
         Error::ErrorFind(expr.keyword, "Can't use 'this' outside of a class.");
         return nullptr;
     }
-    resolveLocal(&expr, expr.keyword);
+    ResolveLocal(&expr, expr.keyword);
     return nullptr;
 }
-Object Resolver::VisitUnary(Unary &expr)
+Object Resolver::VisitUnaryExpr(Unary &expr)
 {
-    resolve(expr.right);
+    Resolve(expr.right);
     return nullptr;
 }
-Object Resolver::VisitVariable(Variable *expr)
+Object Resolver::VisitVariableExpr(Variable *expr)
 {
     if (!scopes.empty() && !scopes.top().empty() && scopes.top().find(expr->name.lexeme) != scopes.top().end() && scopes.top().find(expr->name.lexeme)->second == false)
     {
         Error::ErrorFind(expr->name, "Can't read local variable in its own initializer.");
     }
 
-    resolveLocal(expr, expr->name);
+    ResolveLocal(expr, expr->name);
     return nullptr;
 }
-void Resolver::resolve(std::vector<Stmt *> statements)
+void Resolver::Resolve(std::vector<Stmt *> statements)
 {
     for (Stmt *statement : statements)
     {
-        resolve(statement);
+        Resolve(statement);
     }
 }
-void Resolver::resolve(Stmt *stmt)
+void Resolver::Resolve(Stmt *stmt)
 {
-    stmt->accept(*this);
+    stmt->Accept(*this);
 }
-void Resolver::resolve(Expr *expr)
+void Resolver::Resolve(Expr *expr)
 {
     expr->Accept(*this);
 }
-void Resolver::resolveFunction(Function *function, FunctionType type)
+void Resolver::ResolveFunction(Function *function, FunctionType type)
 {
 
     FunctionType enclosingFunction = currentFunction;
@@ -221,14 +221,14 @@ void Resolver::resolveFunction(Function *function, FunctionType type)
     //     }
     //     std::cout << "------" << std::endl;
     // }
-    beginScope(); // 这里进去scopes变为空了
+    BeginScope(); // 这里进去scopes变为空了
     for (Token param : function->params)
     {
-        declare(param);
-        define(param);
+        Declare(param);
+        Define(param);
     }
 
-    resolve(function->body);
+    Resolve(function->body);
 
     // temp = scopes;
     // while (!temp.empty()) // 这里少一个
@@ -243,10 +243,10 @@ void Resolver::resolveFunction(Function *function, FunctionType type)
     //     }
     //     std::cout << "------" << std::endl;
     // }
-    endScope();
+    EndScope();
     currentFunction = enclosingFunction;
 }
-void Resolver::beginScope()
+void Resolver::BeginScope()
 {
     // std::stack<std::map<std::string, bool>> temp;
     // temp = scopes;
@@ -279,7 +279,7 @@ void Resolver::beginScope()
     //     std::cout << "------" << std::endl;
     // }
 }
-void Resolver::endScope()
+void Resolver::EndScope()
 {
     // std::stack<std::map<std::string, bool>> temp;
     // // 复制scopes
@@ -299,7 +299,7 @@ void Resolver::endScope()
 
     scopes.pop();
 }
-void Resolver::declare(const Token &name)
+void Resolver::Declare(const Token &name)
 {
     if (scopes.empty())
     {
@@ -314,7 +314,7 @@ void Resolver::declare(const Token &name)
     }
     scope[name.lexeme] = false;
 }
-void Resolver::define(Token &name)
+void Resolver::Define(Token &name)
 {
     if (scopes.empty())
         return;
@@ -335,7 +335,7 @@ void Resolver::define(Token &name)
     //     std::cout << "------" << std::endl;
     // }
 }
-void Resolver::resolveLocal(Expr *expr, const Token &name)
+void Resolver::ResolveLocal(Expr *expr, const Token &name)
 {
     std::stack<std::map<std::string, bool>> temp;
     temp = scopes;
@@ -352,7 +352,7 @@ void Resolver::resolveLocal(Expr *expr, const Token &name)
         //  std::cout << name.lexeme << std::endl;
         if (it != currentScope.end())
         {
-            interpreter->resolve(expr, temp.size() - 1 - i);
+            interpreter->Resolve(expr, temp.size() - 1 - i);
             scopes = temp; // return之前要恢复scopes
             return;
         }

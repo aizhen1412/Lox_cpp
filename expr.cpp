@@ -12,55 +12,55 @@ Object Assign::Accept(Visitor &visitor)
 Binary::Binary(Expr *left, Token op, Expr *right) : left(left), op(op), right(right) {}
 Object Binary::Accept(Visitor &visitor)
 {
-    return visitor.VisitBinary(*this);
+    return visitor.VisitBinaryExpr(*this);
 }
 Call::Call(Expr *callee, Token paren, std::vector<Expr *> arguments) : callee(callee), paren(paren), arguments(arguments) {}
 Object Call::Accept(Visitor &visitor)
 {
-    return visitor.VisitCall(*this);
+    return visitor.VisitCallExpr(*this);
 }
 Get::Get(Expr *object, Token name) : object(object), name(name) {}
 Object Get::Accept(Visitor &visitor)
 {
-    return visitor.VisitGet(*this);
+    return visitor.VisitGetExpr(*this);
 }
 Grouping::Grouping(Expr *expression) : expression(expression) {}
 Object Grouping::Accept(Visitor &visitor)
 {
-    return visitor.VisitGrouping(*this);
+    return visitor.VisitGroupingExpr(*this);
 }
 Literal::Literal(Object value) : value(value) {}
 Object Literal::Accept(Visitor &visitor)
 {
-    return visitor.VisitLiteral(*this);
+    return visitor.VisitLiteralExpr(*this);
 }
 Logical::Logical(Expr *left, Token op, Expr *right) : left(left), op(op), right(right) {}
 Object Logical::Accept(Visitor &visitor)
 {
-    return visitor.VisitLogical(*this);
+    return visitor.VisitLogicalExpr(*this);
 }
 Set::Set(Expr *object, Token name, Expr *value) : object(object), name(name), value(value) {}
 Object Set::Accept(Visitor &visitor)
 {
-    return visitor.VisitSet(*this);
+    return visitor.VisitSetExpr(*this);
 }
 Super::Super(Token keyword, Token method) : keyword(keyword), method(method) {}
 Object Super::Accept(Visitor &visitor)
 {
-    return visitor.VisitSuper(*this);
+    return visitor.VisitSuperExpr(*this);
 }
 This::This(Token keyword) : keyword(keyword) {}
 Object This::Accept(Visitor &visitor)
 {
-    return visitor.VisitThis(*this);
+    return visitor.VisitThisExpr(*this);
 }
 Unary::Unary(Token op, Expr *right) : op(op), right(right) {}
 Object Unary::Accept(Visitor &visitor)
 {
-    return visitor.VisitUnary(*this);
+    return visitor.VisitUnaryExpr(*this);
 }
 Variable::Variable(Token name) : name(name) {}
 Object Variable::Accept(Visitor &visitor)
 {
-    return visitor.VisitVariable(this);
+    return visitor.VisitVariableExpr(this);
 }

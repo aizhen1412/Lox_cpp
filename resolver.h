@@ -31,25 +31,26 @@ public:
     FunctionType currentFunction = FunctionType::NONE;
 
     Resolver(Interpreter *interpreter);
-    Object visitBlockStmt(Block &stmt) override;
-    Object visitClassStmt(Class &stmt);
-    Object visitExpressionStmt(Expression &stmt) override;
-    Object visitFunctionStmt(Function &stmt) override;
-    Object visitIfStmt(If &stmt) override;
-    Object visitPrintStmt(Print &stmt) override;
-    Object visitReturnStmt(Return &stmt) override;
-    Object visitVarStmt(Var &stmt) override;
-    Object visitWhileStmt(While &stmt) override;
-    Object VisitAssignExpr(Assign &expr) override;
-    Object VisitBinary(Binary &expr) override;
-    Object VisitCall(Call &expr) override;
 
-    Object VisitGet(Get &expr); // 应该是这里的问题，interpreter没有Expr这个字母
-    Object VisitGrouping(Grouping &expr) override;
-    Object VisitLiteral(Literal &expr) override;
-    Object VisitLogical(Logical &expr) override;
-    Object VisitSet(Set &expr);
-    Object VisitSuper(Super &expr)
+    Object VisitBlockStmt(Block &stmt) override;
+    Object VisitClassStmt(Class &stmt);
+    Object VisitExpressionStmt(Expression &stmt) override;
+    Object VisitFunctionStmt(Function &stmt) override;
+    Object VisitIfStmt(If &stmt) override;
+    Object VisitPrintStmt(Print &stmt) override;
+    Object VisitReturnStmt(Return &stmt) override;
+    Object VisitVarStmt(Var &stmt) override;
+    Object VisitWhileStmt(While &stmt) override;
+
+    Object VisitAssignExpr(Assign &expr) override;
+    Object VisitBinaryExpr(Binary &expr) override;
+    Object VisitCallExpr(Call &expr) override;
+    Object VisitGetExpr(Get &expr); // 应该是这里的问题，interpreter没有Expr这个字母
+    Object VisitGroupingExpr(Grouping &expr) override;
+    Object VisitLiteralExpr(Literal &expr) override;
+    Object VisitLogicalExpr(Logical &expr) override;
+    Object VisitSetExpr(Set &expr);
+    Object VisitSuperExpr(Super &expr)
     {
         if (currentClass == ClassType::NONE_CLASS)
         {
@@ -61,20 +62,20 @@ public:
             Error::ErrorFind(expr.keyword,
                              "Can't use 'super' in a class with no superclass.");
         }
-        resolveLocal(&expr, expr.keyword);
+        ResolveLocal(&expr, expr.keyword);
         return nullptr;
     }
-    Object VisitThis(This &expr) override;
-    Object VisitUnary(Unary &expr) override;
-    Object VisitVariable(Variable *expr);
-    void resolve(std::vector<Stmt *> statements);
-    void resolve(Stmt *stmt);
-    void resolve(Expr *expr);
-    void resolveFunction(Function *function, FunctionType type);
-    void beginScope();
-    void endScope();
-    void declare(const Token &name);
-    void define(Token &name);
-    void resolveLocal(Expr *expr, const Token &name);
+    Object VisitThisExpr(This &expr) override;
+    Object VisitUnaryExpr(Unary &expr) override;
+    Object VisitVariableExpr(Variable *expr);
+    void Resolve(std::vector<Stmt *> statements);
+    void Resolve(Stmt *stmt);
+    void Resolve(Expr *expr);
+    void ResolveFunction(Function *function, FunctionType type);
+    void BeginScope();
+    void EndScope();
+    void Declare(const Token &name);
+    void Define(Token &name);
+    void ResolveLocal(Expr *expr, const Token &name);
 };
 #endif // RESOLVER_H

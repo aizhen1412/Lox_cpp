@@ -12,25 +12,14 @@ public:
     Function declaration;
     Environment *closure;
 
-    bool isInitializer;
-
-    LoxFunction(Function declaration, Environment *closure, bool isInitializer)
-    {
-        this->isInitializer = isInitializer;
-        this->closure = closure;
-        this->declaration = declaration;
-    }
+    bool is_initializer;
     LoxFunction();
-    //  LoxFunction(Function &declaration, Environment *closure);
-    Object call(Interpreter *interpreter, std::vector<Object> arguments);
-    int arity();
-    std::string toString();
+    LoxFunction(Function declaration, Environment *closure, bool isInitializer);
 
-    LoxFunction *bind(LoxInstance *instance)
-    {
-        Environment *environment = new Environment(closure);
-        environment->define("this", instance);
-        return new LoxFunction(declaration, environment, isInitializer);
-    }
+    Object Call(Interpreter *interpreter, std::vector<Object> arguments);
+    int Arity();
+    std::string ToString();
+
+    LoxFunction *Bind(LoxInstance *instance);
 };
 #endif // LOX_FUNCTION_H

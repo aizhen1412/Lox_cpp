@@ -30,7 +30,7 @@ Object Environment::get(Token name)
         return enclosing->get(name);
     throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
 }
-void Environment::assign(const Token &name, Object value)
+void Environment::Assign(const Token &name, Object value)
 {
     auto it = values.find(name.lexeme);
     if (it != values.end())
@@ -40,13 +40,13 @@ void Environment::assign(const Token &name, Object value)
     }
     if (enclosing != nullptr)
     {
-        enclosing->assign(name, value);
+        enclosing->Assign(name, value);
         return;
     }
     throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
 }
 
-void Environment::define(const std::string &name, Object value)
+void Environment::Define(const std::string &name, Object value)
 {
     values[name] = value;
     // if (std::holds_alternative<double>(value) == true)
@@ -54,16 +54,16 @@ void Environment::define(const std::string &name, Object value)
     //     std::cout << "define " << name << "=" << std::get<double>(value) << std::endl;
     // }
 }
-Object Environment::getAt(int distance, std::string name)
+Object Environment::GetAt(int distance, std::string name)
 {
     //  std::cout << "name " << name << std::endl;
-    return ancestor(distance)->values[name];
+    return Ancestor(distance)->values[name];
 }
-void Environment::assignAt(int distance, Token name, Object value)
+void Environment::AssignAt(int distance, Token name, Object value)
 {
-    ancestor(distance)->values[name.lexeme] = value;
+    Ancestor(distance)->values[name.lexeme] = value;
 }
-Environment *Environment::ancestor(int distance)
+Environment *Environment::Ancestor(int distance)
 {
     // std::cout << distance << std::endl;
     Environment *environment = this;

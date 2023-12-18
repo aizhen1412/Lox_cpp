@@ -3,21 +3,24 @@
 #include "interpreter.h"
 
 LoxFunction::LoxFunction() = default;
-// LoxFunction::LoxFunction(Function &declaration, Environment *closure)
-// {
-//     this->closure = closure;
-//     this->declaration = declaration;
-// }
-Object LoxFunction::call(Interpreter *interpreter, std::vector<Object> arguments)
+LoxFunction::LoxFunction(Function declaration, Environment *closure, bool isInitializer) : declaration(declaration), closure(closure), is_initializer(isInitializer) {}
+
+LoxFunction *LoxFunction::Bind(LoxInstance *instance)
+{
+    Environment *environment = new Environment(closure);
+    environment->Define("this", instance);
+    return new LoxFunction(declaration, environment, is_initializer);
+}
+Object LoxFunction::Call(Interpreter *interpreter, std::vector<Object> arguments)
 {
     Environment *environment = new Environment(closure);
     for (int i = 0; i < declaration.params.size(); i++)
     {
-        environment->define(declaration.params[i].lexeme, arguments[i]);
+        environment->Define(declaration.params[i].lexeme, arguments[i]);
     }
     try
     {
-        interpreter->executeBlock(declaration.body, environment);
+        interpreter->ExecuteBlock(declaration.body, environment);
     }
     catch (const Return_method &returnValue)
     {
@@ -27,19 +30,19 @@ Object LoxFunction::call(Interpreter *interpreter, std::vector<Object> arguments
         // interpreter->count++;
         // std::cout << "call recover " << std::endl;
         //   interpreter->test();
-        if (isInitializer)
-            return closure->getAt(0, "this");
+        if (is_initializer)
+            return closure->GetAt(0, "this");
         return returnValue.value;
     }
-    if (isInitializer)
-        return closure->getAt(0, "this");
+    if (is_initializer)
+        return closure->GetAt(0, "this");
     return nullptr;
 }
-int LoxFunction::arity()
+int LoxFunction::Arity()
 {
     return declaration.params.size();
 }
-std::string LoxFunction::toString()
+std::string LoxFunction::ToString()
 {
     return "<fn " + declaration.name.lexeme + ">";
 }

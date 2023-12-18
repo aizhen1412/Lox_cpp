@@ -14,61 +14,42 @@ class Interpreter : public Visitor // 后面换成visitor
 {
 public:
     int count = 0;
-    Interpreter()
-    {
-        //  globals->define("clock", new LoxCallable());
-    }
+    Interpreter() = default;
 
-    Object VisitGet(Get &Expr) override;
-
-    Object VisitSuper(Super &Expr) override;
-
-    Object VisitLiteral(Literal &expr) override;
-    Object VisitLogical(Logical &expr) override;
-    Object VisitSet(Set &Expr) override;
-    Object visitSuperExpr(Super *expr)
-    {
-        int distance = locals[expr];
-        LoxClass *superclass = std::get<LoxClass *>(environment->getAt(distance, "super"));
-        LoxInstance *object = std::get<LoxInstance *>(environment->getAt(distance - 1, "this"));
-        LoxFunction *method = superclass->findMethod(expr->method.lexeme);
-        if (method == nullptr)
-        {
-            throw new RuntimeError(expr->method,
-                                   "Undefined property '" + expr->method.lexeme + "'.");
-        }
-
-        return method->bind(object);
-    }
-    Object VisitThis(This &expr);
-    Object VisitUnary(Unary &expr) override;
-    Object VisitVariable(Variable *expr) override;
-    Object lookUpVariable(Token name, Expr *expr);
-    Object VisitGrouping(Grouping &expr) override;
-    Object VisitBinary(Binary &expr) override;
-    Object VisitCall(Call &expr);
+    Object VisitGetExpr(Get &Expr) override;
+    Object VisitSuperExpr(Super &Expr) override;
+    Object VisitLiteralExpr(Literal &expr) override;
+    Object VisitLogicalExpr(Logical &expr) override;
+    Object VisitSetExpr(Set &Expr) override;
+    Object VisitThisExpr(This &expr);
+    Object VisitUnaryExpr(Unary &expr) override;
+    Object VisitVariableExpr(Variable *expr) override;
+    Object VisitGroupingExpr(Grouping &expr) override;
+    Object VisitBinaryExpr(Binary &expr) override;
+    Object VisitCallExpr(Call &expr);
+    Object LookUpVariable(Token name, Expr *expr);
 
     void CheckNumberOperand(Token op, Object operand);
     void CheckNumberOperands(Token op, Object left, Object right);
     bool IsTruthy(Object object);
     bool IsEqual(Object a, Object b);
     Object Evaluate(Expr *expr);
-    void execute(Stmt *stmt);
-    void resolve(Expr *expr, int depth);
-    void executeBlock(std::vector<Stmt *> statements, Environment *environment);
-    Object visitBlockStmt(Block &stmt) override;
-    Object visitClassStmt(Class &stmt) override;
-    Object visitExpressionStmt(Expression &stmt) override;
-    Object visitFunctionStmt(Function &stmt);
-    Object visitIfStmt(If &stmt);
-    Object visitPrintStmt(Print &stmt) override;
-    Object visitReturnStmt(Return &stmt);
-    Object visitVarStmt(Var &stmt) override;
-    Object visitWhileStmt(While &stmt) override;
-    Object VisitAssignExpr(Assign &expr);
-
+    void Execute(Stmt *stmt);
+    void Resolve(Expr *expr, int depth);
+    void ExecuteBlock(std::vector<Stmt *> statements, Environment *environment);
     void Interpret(std::vector<Stmt *> statements);
     std::string Stringify(Object object);
+
+    Object VisitBlockStmt(Block &stmt) override;
+    Object VisitClassStmt(Class &stmt) override;
+    Object VisitExpressionStmt(Expression &stmt) override;
+    Object VisitFunctionStmt(Function &stmt);
+    Object VisitIfStmt(If &stmt);
+    Object VisitPrintStmt(Print &stmt) override;
+    Object VisitReturnStmt(Return &stmt);
+    Object VisitVarStmt(Var &stmt) override;
+    Object VisitWhileStmt(While &stmt) override;
+    Object VisitAssignExpr(Assign &expr);
 
     Environment *globals = new Environment();
     Environment *environment = globals;

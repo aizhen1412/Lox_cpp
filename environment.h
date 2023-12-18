@@ -11,11 +11,11 @@ public:
     Environment();
     Environment(Environment *enclosing);
     Object get(Token name);
-    void assign(const Token &name, Object value);
-    void define(const std::string &name, Object value);
-    Object getAt(int distance, std::string name);
-    void assignAt(int distance, Token name, Object value);
-    Environment *ancestor(int distance);
+    void Assign(const Token &name, Object value);
+    void Define(const std::string &name, Object value);
+    Object GetAt(int distance, std::string name);
+    void AssignAt(int distance, Token name, Object value);
+    Environment *Ancestor(int distance);
 
     Environment *enclosing;
     std::unordered_map<std::string, Object> values;

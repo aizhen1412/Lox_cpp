@@ -10,7 +10,7 @@ Parser::Parser(std::vector<Token> tokens)
     this->tokens = tokens;
 }
 
-std::vector<Stmt *> Parser::parse() // 解析表达式
+std::vector<Stmt *> Parser::Parse() // 解析表达式
 {
     // try
     // {
@@ -23,52 +23,52 @@ std::vector<Stmt *> Parser::parse() // 解析表达式
     std::vector<Stmt *> statements;
     while (!IsAtEnd())
     {
-        statements.push_back(declaration());
+        statements.push_back(Declaration());
     }
 
     return statements;
 }
 
-Expr *Parser::Expression_method()
+Expr *Parser::ExpressionFun()
 {
-    return assignment();
+    return Assignment();
     //  return Equality(); // 等式
 }
-Stmt *Parser::printStatement()
+Stmt *Parser::PrintStatement()
 {
-    Expr *value = Expression_method();
+    Expr *value = ExpressionFun();
     Consume(SEMICOLON, "Expect ';' after value.");
     return new Print(value);
 }
-Stmt *Parser::varDeclaration()
+Stmt *Parser::VarDeclaration()
 {
     Token name = Consume(IDENTIFIER, "Expect variable name.");
 
     Expr *initializer = nullptr;
     if (Match(EQUAL))
     {
-        initializer = Expression_method();
+        initializer = ExpressionFun();
     }
 
     Consume(SEMICOLON, "Expect ';' after variable declaration.");
     return new Var(name, initializer);
 }
-Stmt *Parser::whileStatement()
+Stmt *Parser::WhileStatement()
 {
     Consume(LEFT_PAREN, "Expect '(' after 'while'.");
-    Expr *condition = Expression_method();
+    Expr *condition = ExpressionFun();
     Consume(RIGHT_PAREN, "Expect ')' after condition.");
-    Stmt *body = statement();
+    Stmt *body = Statement();
 
     return new While(condition, body);
 }
-Stmt *Parser::expressionStatement()
+Stmt *Parser::ExpressionStatement()
 {
-    Expr *expr = Expression_method();
+    Expr *expr = ExpressionFun();
     Consume(SEMICOLON, "Expect ';' after expression.");
     return new Expression(expr);
 }
-Function *Parser::function(std::string kind)
+Function *Parser::FunctionMethod(std::string kind)
 {
     Token name = Consume(IDENTIFIER, "Expect " + kind + " name.");
     Consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
@@ -79,7 +79,7 @@ Function *Parser::function(std::string kind)
         {
             if (parameters.size() >= 255)
             {
-                error(Peek(), "Can't have more than 255 parameters.");
+                Error(Peek(), "Can't have more than 255 parameters.");
             }
 
             parameters.push_back(Consume(IDENTIFIER, "Expect parameter name."));
@@ -87,16 +87,16 @@ Function *Parser::function(std::string kind)
     }
     Consume(RIGHT_PAREN, "Expect ')' after parameters.");
     Consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
-    std::vector<Stmt *> body = block();
+    std::vector<Stmt *> body = BlockFun();
     return new Function(name, parameters, body);
 }
-std::vector<Stmt *> Parser::block()
+std::vector<Stmt *> Parser::BlockFun()
 {
     std::vector<Stmt *> statements;
 
     while (!Check(RIGHT_BRACE) && !IsAtEnd())
     {
-        statements.push_back(declaration());
+        statements.push_back(Declaration());
     }
 
     Consume(RIGHT_BRACE, "Expect '}' after block.");
@@ -104,14 +104,14 @@ std::vector<Stmt *> Parser::block()
     return statements;
 }
 
-Expr *Parser::assignment()
+Expr *Parser::Assignment()
 {
-    Expr *expr = or_me();
+    Expr *expr = Or();
 
     if (Match(EQUAL))
     {
         Token equals = Previous();
-        Expr *value = assignment();
+        Expr *value = Assignment();
 
         if (auto variableExpr = dynamic_cast<Variable *>(expr))
         {
@@ -123,25 +123,25 @@ Expr *Parser::assignment()
             // Get get = (Get)getExpr;
             return new Set(getExpr->object, getExpr->name, value);
 
-            error(equals, "Invalid assignment target.");
+            Error(equals, "Invalid assignment target.");
         }
     }            // return expr;
     return expr; //}这样是错的，搞了我三天没找到!!!
 }
-Expr *Parser::or_me()
+Expr *Parser::Or()
 {
-    Expr *expr = and_me();
+    Expr *expr = And();
 
     while (Match(OR))
     {
         Token op = Previous();
-        Expr *right = and_me();
+        Expr *right = And();
         expr = new Logical(expr, op, right);
     }
 
     return expr;
 }
-Expr *Parser::and_me()
+Expr *Parser::And()
 {
     Expr *expr = Equality();
 
@@ -154,36 +154,36 @@ Expr *Parser::and_me()
 
     return expr;
 }
-Stmt *Parser::statement()
+Stmt *Parser::Statement()
 {
     if (Match(FOR))
-        return forStatement();
+        return ForStatement();
     if (Match(IF))
-        return ifStatement();
+        return IfStatement();
     if (Match(PRINT))
-        return printStatement();
+        return PrintStatement();
     if (Match(RETURN))
-        return returnStatement();
+        return ReturnStatement();
     if (Match(WHILE))
-        return whileStatement();
+        return WhileStatement();
     if (Match(LEFT_BRACE))
-        return new Block(block());
+        return new Block(BlockFun());
 
-    return expressionStatement();
+    return ExpressionStatement();
 }
-Stmt *Parser::returnStatement()
+Stmt *Parser::ReturnStatement()
 {
     Token keyword = Previous();
     Expr *value = nullptr;
     if (!Check(SEMICOLON))
     {
-        value = Expression_method();
+        value = ExpressionFun();
     }
 
     Consume(SEMICOLON, "Expect ';' after return value.");
     return new Return(keyword, value);
 }
-Stmt *Parser::forStatement()
+Stmt *Parser::ForStatement()
 {
     Consume(LEFT_PAREN, "Expect '(' after 'for'.");
 
@@ -194,25 +194,25 @@ Stmt *Parser::forStatement()
     }
     else if (Match(VAR))
     {
-        initializer = varDeclaration();
+        initializer = VarDeclaration();
     }
     else
     {
-        initializer = expressionStatement();
+        initializer = ExpressionStatement();
     }
     Expr *condition = nullptr;
     if (!Check(SEMICOLON))
     {
-        condition = Expression_method();
+        condition = ExpressionFun();
     }
     Consume(SEMICOLON, "Expect ';' after loop condition.");
     Expr *increment = nullptr;
     if (!Check(RIGHT_PAREN))
     {
-        increment = Expression_method();
+        increment = ExpressionFun();
     }
     Consume(RIGHT_PAREN, "Expect ')' after for clauses.");
-    Stmt *body = statement();
+    Stmt *body = Statement();
     if (increment != nullptr)
     {
         std::vector<Stmt *> stmtVector;
@@ -232,33 +232,33 @@ Stmt *Parser::forStatement()
     }
     return body;
 }
-Stmt *Parser::ifStatement()
+Stmt *Parser::IfStatement()
 {
     Consume(LEFT_PAREN, "Expect '(' after 'if'.");
-    Expr *condition = Expression_method();
+    Expr *condition = ExpressionFun();
     Consume(RIGHT_PAREN, "Expect ')' after if condition.");
 
-    Stmt *thenBranch = statement();
+    Stmt *thenBranch = Statement();
     Stmt *elseBranch = nullptr;
     if (Match(ELSE))
     {
-        elseBranch = statement();
+        elseBranch = Statement();
     }
 
     return new If(condition, thenBranch, elseBranch);
 }
-Stmt *Parser::declaration()
+Stmt *Parser::Declaration()
 {
     try
     {
         if (Match(CLASS))
-            return classDeclaration();
+            return ClassDeclaration();
         if (Match(FUN))
-            return function("function");
+            return FunctionMethod("function");
         if (Match(VAR))
-            return varDeclaration();
+            return VarDeclaration();
 
-        return statement();
+        return Statement();
     }
     catch (ParseError error)
     {
@@ -266,7 +266,7 @@ Stmt *Parser::declaration()
         return nullptr;
     }
 }
-Stmt *Parser::classDeclaration()
+Stmt *Parser::ClassDeclaration()
 {
     Token name = Consume(IDENTIFIER, "Expect class name.");
     Variable *superclass = nullptr;
@@ -279,7 +279,7 @@ Stmt *Parser::classDeclaration()
     std::vector<Function *> methods;
     while (!Check(RIGHT_BRACE) && !IsAtEnd())
     {
-        methods.push_back(function("method"));
+        methods.push_back(FunctionMethod("method"));
     }
     Consume(RIGHT_BRACE, "Expect '}' after class body.");
 
@@ -329,30 +329,30 @@ Expr *Parser::Term()
 
 Expr *Parser::Factor()
 {
-    Expr *expr = Unary();
+    Expr *expr = UnaryFun();
 
     while (Match(SLASH, STAR))
     {
         Token op = Previous();
-        Expr *right = Unary();
+        Expr *right = UnaryFun();
         expr = new Binary(expr, op, right);
     }
 
     return expr;
 }
 
-Expr *Parser::Unary()
+Expr *Parser::UnaryFun()
 {
     if (Match(BANG, MINUS))
     {
         Token op = Previous();
-        Expr *right = Unary();
-        return new class Unary(op, right);
+        Expr *right = UnaryFun();
+        return new Unary(op, right);
     }
 
-    return call();
+    return CallFun();
 }
-Expr *Parser::finishCall(Expr *callee)
+Expr *Parser::FinishCall(Expr *callee)
 {
     std::vector<Expr *> arguments;
     if (!Check(RIGHT_PAREN))
@@ -361,9 +361,9 @@ Expr *Parser::finishCall(Expr *callee)
         {
             if (arguments.size() >= 255)
             {
-                error(Peek(), "Can't have more than 255 arguments.");
+                Error(Peek(), "Can't have more than 255 arguments.");
             }
-            arguments.push_back(Expression_method());
+            arguments.push_back(ExpressionFun());
         } while (Match(COMMA));
     }
 
@@ -371,7 +371,7 @@ Expr *Parser::finishCall(Expr *callee)
 
     return new Call(callee, paren, arguments);
 }
-Expr *Parser::call()
+Expr *Parser::CallFun()
 {
     Expr *expr = Primary();
 
@@ -379,7 +379,7 @@ Expr *Parser::call()
     {
         if (Match(LEFT_PAREN))
         {
-            expr = finishCall(expr);
+            expr = FinishCall(expr);
         }
         else if (Match(DOT))
         {
@@ -422,11 +422,11 @@ Expr *Parser::Primary()
     }
     if (Match(LEFT_PAREN))
     {
-        Expr *expr = Expression_method();
+        Expr *expr = ExpressionFun();
         Consume(RIGHT_PAREN, "Expect ')' after expression.");
         return new Grouping(expr);
     }
-    throw error(Peek(), "Expect expression.");
+    throw Error(Peek(), "Expect expression.");
     // exit(65);
 }
 
@@ -451,11 +451,11 @@ Token Parser::Consume(TokenType type, std::string message)
     if (Check(type))
         return Advance();
 
-    throw error(Peek(), message);
+    throw Error(Peek(), message);
     // exit(65);
 }
 
-Parser::ParseError Parser::error(Token token, std::string message)
+Parser::ParseError Parser::Error(Token token, std::string message)
 {
     Error::ErrorFind(token, message);
     return ParseError();

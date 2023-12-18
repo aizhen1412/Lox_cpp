@@ -52,7 +52,7 @@ void Lox::Run(const std::string &source) // 运行源代码
     {
         Parser parser(tokens);
 
-        std::vector<Stmt *> statements = parser.parse();
+        std::vector<Stmt *> statements = parser.Parse();
 
         // if (expression == nullptr)
         // {
@@ -70,7 +70,7 @@ void Lox::Run(const std::string &source) // 运行源代码
 
         Resolver resolver = Resolver(&interpreter);
 
-        resolver.resolve(statements);
+        resolver.Resolve(statements);
         //   resolver.test();
         // if (had_error)
         //     return;

@@ -4,6 +4,7 @@
 #include <vector>
 #include "token.h"
 #include <iostream>
+
 class Visitor;
 class Assign;
 class Binary;
@@ -38,33 +39,33 @@ class Stmt
 {
 public:
   virtual ~Stmt() = default;
-  virtual Object accept(Visitor &visitor) = 0;
+  virtual Object Accept(Visitor &visitor) = 0;
 };
 class Visitor
 {
 public:
-  // virtual void test() = 0;
   virtual Object VisitAssignExpr(Assign &Expr) = 0;
-  virtual Object VisitBinary(Binary &Expr) = 0;
-  virtual Object VisitCall(Call &Expr) = 0;
-  virtual Object VisitGet(Get &Expr) = 0;
-  virtual Object VisitGrouping(Grouping &Expr) = 0;
-  virtual Object VisitLiteral(Literal &Expr) = 0;
-  virtual Object VisitLogical(Logical &Expr) = 0;
-  virtual Object VisitSet(Set &Expr) = 0;
-  virtual Object VisitSuper(Super &Expr) = 0;
-  virtual Object VisitThis(This &Expr) = 0;
-  virtual Object VisitUnary(Unary &Expr) = 0;
-  virtual Object VisitVariable(Variable *Expr) = 0;
-  virtual Object visitBlockStmt(Block &stmt) = 0;
-  virtual Object visitClassStmt(Class &stmt) = 0;
-  virtual Object visitExpressionStmt(Expression &stmt) = 0;
-  virtual Object visitFunctionStmt(Function &stmt) = 0;
-  virtual Object visitIfStmt(If &stmt) = 0;
-  virtual Object visitPrintStmt(Print &stmt) = 0;
-  virtual Object visitReturnStmt(Return &stmt) = 0;
-  virtual Object visitVarStmt(Var &stmt) = 0;
-  virtual Object visitWhileStmt(While &stmt) = 0;
+  virtual Object VisitBinaryExpr(Binary &Expr) = 0;
+  virtual Object VisitCallExpr(Call &Expr) = 0;
+  virtual Object VisitGetExpr(Get &Expr) = 0;
+  virtual Object VisitGroupingExpr(Grouping &Expr) = 0;
+  virtual Object VisitLiteralExpr(Literal &Expr) = 0;
+  virtual Object VisitLogicalExpr(Logical &Expr) = 0;
+  virtual Object VisitSetExpr(Set &Expr) = 0;
+  virtual Object VisitSuperExpr(Super &Expr) = 0;
+  virtual Object VisitThisExpr(This &Expr) = 0;
+  virtual Object VisitUnaryExpr(Unary &Expr) = 0;
+  virtual Object VisitVariableExpr(Variable *Expr) = 0;
+
+  virtual Object VisitBlockStmt(Block &stmt) = 0;
+  virtual Object VisitClassStmt(Class &stmt) = 0;
+  virtual Object VisitExpressionStmt(Expression &stmt) = 0;
+  virtual Object VisitFunctionStmt(Function &stmt) = 0;
+  virtual Object VisitIfStmt(If &stmt) = 0;
+  virtual Object VisitPrintStmt(Print &stmt) = 0;
+  virtual Object VisitReturnStmt(Return &stmt) = 0;
+  virtual Object VisitVarStmt(Var &stmt) = 0;
+  virtual Object VisitWhileStmt(While &stmt) = 0;
 };
 
 class Assign : public Expr
@@ -187,9 +188,9 @@ public:
     }
   }
 
-  Object accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
-    return visitor.visitBlockStmt(*this);
+    return visitor.VisitBlockStmt(*this);
   }
 
   std::vector<Stmt *> statements;
@@ -201,9 +202,9 @@ public:
   Class(Token name, Variable *superclass, std::vector<Function *> &methods)
       : name(name), superclass(superclass), methods(methods) {}
 
-  Object accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
-    return visitor.visitClassStmt(*this);
+    return visitor.VisitClassStmt(*this);
   }
 
   Token name;
@@ -220,9 +221,9 @@ public:
     delete expression;
   }
 
-  Object accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
-    return visitor.visitExpressionStmt(*this);
+    return visitor.VisitExpressionStmt(*this);
   }
 
   Expr *expression;
@@ -234,17 +235,9 @@ public:
   Function() = default;
   Function(Token name, std::vector<Token> &params, std::vector<Stmt *> &body) : name(name), params(params), body(body) {}
 
-  // virtual ~Function()
-  // {
-  //   for (auto stmt : body)
-  //   {
-  //     delete stmt;
-  //   }
-  // }
-
-  Object accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
-    return visitor.visitFunctionStmt(*this);
+    return visitor.VisitFunctionStmt(*this);
   }
 
   Token name;
@@ -266,9 +259,9 @@ public:
       delete elseBranch;
   }
 
-  Object accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
-    return visitor.visitIfStmt(*this);
+    return visitor.VisitIfStmt(*this);
   }
 
   Expr *condition;
@@ -285,9 +278,9 @@ public:
     delete expression;
   }
 
-  Object accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
-    return visitor.visitPrintStmt(*this);
+    return visitor.VisitPrintStmt(*this);
   }
 
   Expr *expression;
@@ -302,9 +295,9 @@ public:
     delete value;
   }
 
-  Object accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
-    return visitor.visitReturnStmt(*this);
+    return visitor.VisitReturnStmt(*this);
   }
 
   Token keyword;
@@ -320,9 +313,9 @@ public:
     delete initializer;
   }
 
-  Object accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
-    return visitor.visitVarStmt(*this);
+    return visitor.VisitVarStmt(*this);
   }
 
   Token name;
@@ -339,9 +332,9 @@ public:
     delete body;
   }
 
-  Object accept(Visitor &visitor) override
+  Object Accept(Visitor &visitor) override
   {
-    return visitor.visitWhileStmt(*this);
+    return visitor.VisitWhileStmt(*this);
   }
 
   Expr *condition;
