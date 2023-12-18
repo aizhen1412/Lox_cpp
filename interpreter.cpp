@@ -9,6 +9,20 @@
 #include "lox_class.h"
 #include "lox_instance.h"
 
+Object Interpreter::VisitSuper(Super &Expr)
+{
+    int distance = locals[&Expr];
+    LoxClass *superclass = std::get<LoxClass *>(environment->getAt(distance, "super"));
+    LoxInstance *object = std::get<LoxInstance *>(environment->getAt(distance - 1, "this"));
+    LoxFunction *method = superclass->findMethod(Expr.method.lexeme);
+    if (method == nullptr)
+    {
+        throw new RuntimeError(Expr.method,
+                               "Undefined property '" + Expr.method.lexeme + "'.");
+    }
+
+    return method->bind(object);
+}
 Object Interpreter::VisitLiteral(Literal &expr)
 {
     return expr.value;
@@ -172,7 +186,7 @@ Object Interpreter::VisitBinary(Binary &expr)
 }
 Object Interpreter::VisitCall(Call &expr)
 {
-    Object callee = Evaluate(expr.callee);
+    Object callee = Evaluate(expr.callee); // bool
 
     std::vector<Object> arguments_;
     for (Expr *argument : expr.arguments)
@@ -319,10 +333,10 @@ Object Interpreter::visitClassStmt(Class &stmt)
     if (stmt.superclass != nullptr) // here is nullptr
     {
         superclass = Evaluate(stmt.superclass);
-        if ((std::holds_alternative<std::nullptr_t>(superclass)))
-        {
-            std::cout << "superclass == null" << std::endl;
-        }
+        // if ((std::holds_alternative<std::nullptr_t>(superclass)))
+        // {
+        //     std::cout << "superclass == null" << std::endl;
+        // }
         if (!(std::holds_alternative<LoxClass *>(superclass)))
         {
             throw new RuntimeError(stmt.superclass->name, "Superclass must be a class.");
@@ -341,11 +355,11 @@ Object Interpreter::visitClassStmt(Class &stmt)
         methods[method->name.lexeme] = function;
     }
 
+    LoxClass *klass = nullptr;
     if ((std::holds_alternative<std::nullptr_t>(superclass)))
-    {
-        std::cout << "superclass == null" << std::endl;
-    }
-    LoxClass *klass = new LoxClass(stmt.name.lexeme, std::get<LoxClass *>(superclass), methods);
+        klass = new LoxClass(stmt.name.lexeme, std::get<std::nullptr_t>(superclass), methods);
+    else
+        klass = new LoxClass(stmt.name.lexeme, std::get<LoxClass *>(superclass), methods);
 
     if (!(std::holds_alternative<std::nullptr_t>(superclass))) // superclass != null
     {

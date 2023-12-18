@@ -49,7 +49,7 @@ public:
     Object VisitLiteral(Literal &expr) override;
     Object VisitLogical(Logical &expr) override;
     Object VisitSet(Set &expr);
-    Object visitSuperExpr(Super &expr)
+    Object VisitSuper(Super &expr)
     {
         if (currentClass == ClassType::NONE_CLASS)
         {

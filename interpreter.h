@@ -18,14 +18,10 @@ public:
     {
         //  globals->define("clock", new LoxCallable());
     }
-  //  Environment *previous = nullptr;
-    // void test()
-    // {
-    //     std::cout << "environment" << environment << std::endl;
-    // }
+
     Object VisitGet(Get &Expr) override;
 
-    Object VisitSuper(Super &Expr) { return "super"; };
+    Object VisitSuper(Super &Expr) override;
 
     Object VisitLiteral(Literal &expr) override;
     Object VisitLogical(Logical &expr) override;
