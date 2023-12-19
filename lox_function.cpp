@@ -24,12 +24,6 @@ Object LoxFunction::Call(Interpreter *interpreter, std::vector<Object> arguments
     }
     catch (const Return_method &returnValue)
     {
-        //   std::cout << "return " << interpreter->previous << std::endl;
-        // std::cout << "in catch" << std::endl;
-        // interpreter->environment = interpreter->previous;
-        // interpreter->count++;
-        // std::cout << "call recover " << std::endl;
-        //   interpreter->test();
         if (is_initializer)
             return closure->GetAt(0, "this");
         return returnValue.value;

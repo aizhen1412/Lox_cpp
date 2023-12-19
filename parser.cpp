@@ -12,14 +12,6 @@ Parser::Parser(std::vector<Token> tokens)
 
 std::vector<Stmt *> Parser::Parse() // 解析表达式
 {
-    // try
-    // {
-    //     return Expression();
-    // }
-    // catch (ParseError error)
-    // {
-    //     return nullptr;
-    // }
     std::vector<Stmt *> statements;
     while (!IsAtEnd())
     {
@@ -28,7 +20,31 @@ std::vector<Stmt *> Parser::Parse() // 解析表达式
 
     return statements;
 }
+void Parser::Synchronize()
+{
+    Advance();
 
+    while (!IsAtEnd())
+    {
+        if (Previous().type == SEMICOLON)
+            return;
+
+        switch (Peek().type)
+        { // 如果不是分号，就跳过
+        case CLASS:
+        case FUN:
+        case VAR:
+        case FOR:
+        case IF:
+        case WHILE:
+        case PRINT:
+        case RETURN:
+            return;
+        }
+
+        Advance();
+    }
+}
 Expr *Parser::ExpressionFun()
 {
     return Assignment();
@@ -260,9 +276,9 @@ Stmt *Parser::Declaration()
 
         return Statement();
     }
-    catch (ParseError error)
+    catch (const ParseError &error)
     {
-        // synchronize();
+        Synchronize();
         return nullptr;
     }
 }
@@ -427,7 +443,6 @@ Expr *Parser::Primary()
         return new Grouping(expr);
     }
     throw Error(Peek(), "Expect expression.");
-    // exit(65);
 }
 
 template <typename... Args>
@@ -452,39 +467,12 @@ Token Parser::Consume(TokenType type, std::string message)
         return Advance();
 
     throw Error(Peek(), message);
-    // exit(65);
 }
 
 Parser::ParseError Parser::Error(Token token, std::string message)
 {
     Error::ErrorFind(token, message);
     return ParseError();
-}
-
-void Parser::Synchronize()
-{
-    Advance();
-
-    while (!IsAtEnd())
-    {
-        if (Previous().type == SEMICOLON)
-            return;
-
-        switch (Peek().type)
-        {
-        case CLASS:
-        case FUN:
-        case VAR:
-        case FOR:
-        case IF:
-        case WHILE:
-        case PRINT:
-        case RETURN:
-            return;
-        }
-
-        Advance();
-    }
 }
 
 bool Parser::Check(TokenType type)
@@ -510,7 +498,7 @@ Token Parser::Peek()
 {
     if (current >= tokens.size())
     {
-        return Token(END_OF_FILE, "", nullptr, 0);
+        return Token(END_OF_FILE, "", nullptr, tokens[current - 1].line);
     }
     return tokens[current];
 }

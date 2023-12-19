@@ -1,14 +1,2 @@
-class Animal {
-  speak() {
-    print "This animal makes a sound.";
-  }
-}
-
-class Dog < Dog {
-  speak() {
-    print "Woof!";
-  }
-}
-
-var myDog = Dog();
-myDog.speak();  // 输出"Woof!"
+awf;
+asdl;

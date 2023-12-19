@@ -22,6 +22,7 @@ void Lox::RunFile(const std::string &filePath)
     std::stringstream buffer;
     buffer << file.rdbuf();
     Run(buffer.str());
+
     if (had_error)
         exit(65);
     if (had_runtime_error)

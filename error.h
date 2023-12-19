@@ -12,7 +12,7 @@ class Error
 public:
     static void ErrorFind(int line, std::string message);
     static void ErrorFind(Token token, std::string message);
-    static void RuntimeError(RuntimeError error);
+    static void ProcessRuntimeError(RuntimeError error);
 
 private:
     static void Report(int line, std::string where, std::string message);

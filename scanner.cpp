@@ -100,7 +100,6 @@ void Scanner::ScanToken() // 扫描词法单元
         else
         {
             Error::ErrorFind(line, "Unexpected character.");
-            // std::cout << "Unexpected character." << std::endl;
         }
         break;
     }
@@ -133,7 +132,6 @@ void Scanner::AddToken(TokenType type) // 添加词法单元
 
 void Scanner::AddToken(TokenType type, Object literal) // 添加词法单元
 {
-    // std::string text = source.substring(start, current); // 从源代码中截取出当前词法单元的字符串
     std::string text = source.substr(start, current - start); // 从源代码中截取出当前词法单元的字符串
     tokens.push_back(Token(type, text, literal, line));       // 将当前词法单元添加到词法单元列表中
 }
@@ -192,7 +190,6 @@ void Scanner::String() // 处理字符串
     if (IsAtEnd())
     {
         Error::ErrorFind(line, "Unterminated string.");
-        // std::cout << "Unterminated string." << std::endl;
         return;
     }
 

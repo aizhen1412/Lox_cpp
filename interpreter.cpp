@@ -17,8 +17,8 @@ Object Interpreter::VisitSuperExpr(Super &Expr)
     LoxFunction *method = superclass->FindMethod(Expr.method.lexeme);
     if (method == nullptr)
     {
-        throw new RuntimeError(Expr.method,
-                               "Undefined property '" + Expr.method.lexeme + "'.");
+        throw RuntimeError(Expr.method,
+                           "Undefined property '" + Expr.method.lexeme + "'.");
     }
 
     return method->Bind(object);
@@ -55,8 +55,8 @@ Object Interpreter::VisitGetExpr(Get &expr)
     {
         std::cout << "err" << std::endl;
     }
-    throw new RuntimeError(expr.name,
-                           "Only instances have properties.");
+    throw RuntimeError(expr.name,
+                       "Only instances have properties.");
 }
 Object Interpreter::VisitSetExpr(Set &expr)
 {
@@ -71,8 +71,8 @@ Object Interpreter::VisitSetExpr(Set &expr)
     // }
     if (!(std::holds_alternative<LoxInstance *>(object)))
     {
-        throw new RuntimeError(expr.name,
-                               "Only instances have fields.");
+        throw RuntimeError(expr.name,
+                           "Only instances have fields.");
     }
 
     Object value = Evaluate(expr.value);
@@ -106,25 +106,14 @@ Object Interpreter::VisitVariableExpr(Variable *expr)
 }
 Object Interpreter::LookUpVariable(Token name, Expr *expr)
 {
-    // 打印locals
-    // int i = 0;
-    // for (auto it = this->locals.begin(); it != this->locals.end(); it++)
-    // {
-    //     std::cout << expr << std::endl;
-    //     std::cout << "it->first:" << it->first << std::endl;
-    //     std::cout << "it->second:" << it->second << std::endl;
-    //     std::cout << "        " << std::endl;
-    // }
     auto ret = locals.find(expr);
     if (ret != locals.end())
     {
         int distance = ret->second;
-        // std::cout << "distance" << distance << std::endl;
         return environment->GetAt(distance, name.lexeme); //
     }
     else
     {
-        // std::cout << "globals" << std::endl;
         return globals->get(name);
     }
 }
@@ -167,7 +156,7 @@ Object Interpreter::VisitBinaryExpr(Binary &expr)
         {
             return std::get<std::string>(left) + std::get<std::string>(right);
         }
-        throw new RuntimeError(expr.op, "Operands must be two numbers or two strings.");
+        throw RuntimeError(expr.op, "Operands must be two numbers or two strings.");
         break;
     case SLASH:
         CheckNumberOperands(expr.op, left, right);
@@ -199,12 +188,12 @@ Object Interpreter::VisitCallExpr(Call &expr)
         callee = temp;
         if (!(std::holds_alternative<LoxCallable *>(callee)))
         {
-            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+            throw RuntimeError(expr.paren, "Can only call functions and classes.");
         }
         LoxCallable *function = std::get<LoxCallable *>(callee);
         if (arguments_.size() != function->Arity())
         {
-            throw new RuntimeError(expr.paren, "Expected " + std::to_string(function->Arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
+            throw RuntimeError(expr.paren, "Expected " + std::to_string(function->Arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
         }
 
         return function->Call(this, arguments_);
@@ -213,12 +202,12 @@ Object Interpreter::VisitCallExpr(Call &expr)
     {
         if (!(std::holds_alternative<LoxCallable *>(callee)))
         {
-            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+            throw RuntimeError(expr.paren, "Can only call functions and classes.");
         }
         LoxCallable *function = std::get<LoxCallable *>(callee);
         if (arguments_.size() != function->Arity()) // arity() 返回函数的参数个数
         {
-            throw new RuntimeError(expr.paren, "Expected " + std::to_string(function->Arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
+            throw RuntimeError(expr.paren, "Expected " + std::to_string(function->Arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
         }
         LoxFunction *loxFunction = dynamic_cast<LoxFunction *>(function);
         return loxFunction->Call(this, arguments_);
@@ -228,7 +217,7 @@ void Interpreter::CheckNumberOperand(Token op, Object operand) // 检查操作�
 {
     if (std::holds_alternative<double>(operand))
         return;
-    throw new RuntimeError(op, "Operand must be a number.");
+    throw RuntimeError(op, "Operand must be a number.");
 }
 
 void Interpreter::CheckNumberOperands(Token op, Object left, Object right) // 检查操作数是否为数字
@@ -236,7 +225,7 @@ void Interpreter::CheckNumberOperands(Token op, Object left, Object right) // �
     if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right))
         return;
 
-    throw new RuntimeError(op, "Operands must be numbers.");
+    throw RuntimeError(op, "Operands must be numbers.");
 }
 
 bool Interpreter::IsTruthy(Object object)
@@ -310,16 +299,10 @@ void Interpreter::ExecuteBlock(std::vector<Stmt *> statements, Environment *envi
     catch (const Return_method &returnValue)
     {
         this->environment = previous;
-        //  std::cout << "call recover " << std::endl;
         throw returnValue;
         return;
     }
     this->environment = previous; // 抛出return后这里不会执行
-
-    // std::cout << "call recover " << std::endl;
-    // std::cout << "after throw  " << std::endl;
-    // test();
-    // std::cout << "second" << std::get<double>(environment->values["n"]) << std::endl;
 }
 Object Interpreter::VisitBlockStmt(Block &stmt)
 {
@@ -339,7 +322,7 @@ Object Interpreter::VisitClassStmt(Class &stmt)
         // }
         if (!(std::holds_alternative<LoxClass *>(superclass)))
         {
-            throw new RuntimeError(stmt.superclass->name, "Superclass must be a class.");
+            throw RuntimeError(stmt.superclass->name, "Superclass must be a class.");
         }
     }
     environment->Define(stmt.name.lexeme, nullptr);
@@ -458,7 +441,7 @@ void Interpreter::Interpret(std::vector<Stmt *> statements)
     }
     catch (const RuntimeError &error)
     {
-        Error::RuntimeError(error);
+        Error::ProcessRuntimeError(error);
     }
 }
 

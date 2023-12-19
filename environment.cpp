@@ -14,21 +14,11 @@ Object Environment::get(Token name)
 {
     if (values.find(name.lexeme) != values.end())
     {
-        // std::cout << "get " << name.lexeme << std::endl;
-        // if (std::holds_alternative<LoxClass *>(values[name.lexeme]) == true)
-        // {
-        //     std::cout << " class" << std::endl;
-        // }
-        // if (std::holds_alternative<bool>(values[name.lexeme]))
-        // {
-        //     std::cout << "test" << std::get<bool>(values[name.lexeme]) << std::endl;
-        // }
-        // std::cout << values[name.lexeme] << std::endl;
         return values[name.lexeme];
     }
     if (enclosing != nullptr)
         return enclosing->get(name);
-    throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+    throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
 }
 void Environment::Assign(const Token &name, Object value)
 {
@@ -49,10 +39,6 @@ void Environment::Assign(const Token &name, Object value)
 void Environment::Define(const std::string &name, Object value)
 {
     values[name] = value;
-    // if (std::holds_alternative<double>(value) == true)
-    // {
-    //     std::cout << "define " << name << "=" << std::get<double>(value) << std::endl;
-    // }
 }
 Object Environment::GetAt(int distance, std::string name)
 {

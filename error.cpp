@@ -19,10 +19,10 @@ void Error::ErrorFind(Token token, std::string message)
         Report(token.line, " at '" + token.lexeme + "'", message);
     }
 }
-void Error::RuntimeError(class RuntimeError error)
+void Error::ProcessRuntimeError(RuntimeError error)
 {
-    // std::cout << error.getMessage() + "\n[line " + error.token.line + "]" << std::endl;
-    std::cout << "error" << std::endl;
+    std::cout << "[line " + std::to_string(error.token.line) + "] RuntimeError" << std::endl;
+
     had_runtime_error = true;
 }
 void Error::Report(int line, std::string where, std::string message) // 报告错误

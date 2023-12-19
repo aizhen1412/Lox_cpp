@@ -13,7 +13,7 @@ Object LoxInstance::Get(Token name)
     LoxFunction *method = klass->FindMethod(name.lexeme);
     if (method != nullptr)
         return method->Bind(this);
-    throw new RuntimeError(name, "Undefined property '" + name.lexeme + "'.");
+    throw RuntimeError(name, "Undefined property '" + name.lexeme + "'.");
 }
 void LoxInstance::Set(Token name, Object value)
 {

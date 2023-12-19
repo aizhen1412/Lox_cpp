@@ -17,6 +17,7 @@ public:
     };
 
 private:
+    void Synchronize();
     Expr *ExpressionFun();
     Stmt *PrintStatement();
     Stmt *VarDeclaration();
@@ -47,7 +48,6 @@ private:
 
     Token Consume(TokenType type, std::string message);
     ParseError Error(Token token, std::string message);
-    void Synchronize();
     bool Check(TokenType type);
     Token Advance();
     bool IsAtEnd();
