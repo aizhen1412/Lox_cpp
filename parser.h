@@ -17,18 +17,13 @@ public:
     };
 
 private:
-    int current = 0;
-    std::vector<Token> tokens;
-
     Expr *ExpressionFun();
-
     Stmt *PrintStatement();
     Stmt *VarDeclaration();
     Stmt *WhileStatement();
     Stmt *ExpressionStatement();
     Function *FunctionMethod(std::string kind);
     std::vector<Stmt *> BlockFun();
-
     Expr *Assignment();
     Expr *Or();
     Expr *And();
@@ -44,7 +39,6 @@ private:
     Expr *Factor();
     Expr *UnaryFun();
     Expr *FinishCall(Expr *callee);
-
     Expr *CallFun();
     Expr *Primary();
 
@@ -59,6 +53,9 @@ private:
     bool IsAtEnd();
     Token Peek();
     Token Previous();
+
+    int current = 0;
+    std::vector<Token> tokens;
 };
 
 #endif // PARSER_H

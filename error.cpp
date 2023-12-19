@@ -1,6 +1,9 @@
 #include <iostream>
 #include "error.h"
 
+bool had_error = false;
+bool had_runtime_error = false;
+
 void Error::ErrorFind(int line, std::string message)
 {
     Report(line, "", message);
@@ -20,7 +23,7 @@ void Error::RuntimeError(class RuntimeError error)
 {
     // std::cout << error.getMessage() + "\n[line " + error.token.line + "]" << std::endl;
     std::cout << "error" << std::endl;
-    hadRuntimeError = true;
+    had_runtime_error = true;
 }
 void Error::Report(int line, std::string where, std::string message) // 报告错误
 {

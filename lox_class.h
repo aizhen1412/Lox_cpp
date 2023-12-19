@@ -7,6 +7,7 @@
 #include "lox_function.h"
 
 class LoxFunction;
+
 class LoxClass : public LoxCallable
 {
 public:

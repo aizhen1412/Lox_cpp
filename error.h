@@ -4,8 +4,8 @@
 #include "token.h"
 #include "runtime_error.h"
 
-static bool had_error = false;
-static bool hadRuntimeError = false;
+extern bool had_error;
+extern bool had_runtime_error;
 
 class Error
 {

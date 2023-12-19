@@ -24,6 +24,8 @@ void Lox::RunFile(const std::string &filePath)
     Run(buffer.str());
     if (had_error)
         exit(65);
+    if (had_runtime_error)
+        exit(70);
 }
 
 void Lox::RunPrompt()
@@ -35,9 +37,8 @@ void Lox::RunPrompt()
         std::cout << "> ";
         std::getline(std::cin, line);
         if (std::cin.eof() || line.empty())
-        {
             break;
-        }
+
         Run(line);
         had_error = false;
     }
@@ -48,35 +49,19 @@ void Lox::Run(const std::string &source) // 运行源代码
     Scanner scanner(source);                          // 词法分析
     std::vector<Token> tokens = scanner.ScanTokens(); // 存储词法单元
 
-    try
-    {
-        Parser parser(tokens);
+    Parser parser(tokens);
+    std::vector<Stmt *> statements = parser.Parse();
 
-        std::vector<Stmt *> statements = parser.Parse();
+    if (had_error)
+        return;
 
-        // if (expression == nullptr)
-        // {
-        //     return;
-        // }
-        // if (had_error)
-        // {
-        //     return;
-        // }
-        if (hadRuntimeError)
-            return;
-        // Interpreter interpreter = Interpreter();
-        // interpreter.Interpret(statements);
-        Interpreter interpreter = Interpreter();
+    Interpreter interpreter = Interpreter();
 
-        Resolver resolver = Resolver(&interpreter);
+    Resolver resolver = Resolver(&interpreter);
 
-        resolver.Resolve(statements);
-        //   resolver.test();
-        // if (had_error)
-        //     return;
-        interpreter.Interpret(statements);
-    }
-    catch (const Parser::ParseError &error)
-    {
-    }
+    resolver.Resolve(statements);
+
+    if (had_error)
+        return;
+    interpreter.Interpret(statements);
 }

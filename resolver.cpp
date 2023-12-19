@@ -162,6 +162,21 @@ Object Resolver::VisitSetExpr(Set &expr)
     Resolve(expr.object);
     return nullptr;
 }
+Object Resolver::VisitSuperExpr(Super &expr)
+{
+    if (currentClass == ClassType::NONE_CLASS)
+    {
+        Error::ErrorFind(expr.keyword,
+                         "Can't use 'super' outside of a class.");
+    }
+    else if (currentClass != ClassType::SUBCLASS)
+    {
+        Error::ErrorFind(expr.keyword,
+                         "Can't use 'super' in a class with no superclass.");
+    }
+    ResolveLocal(&expr, expr.keyword);
+    return nullptr;
+}
 Object Resolver::VisitThisExpr(This &expr)
 {
     if (currentClass == ClassType::NONE_CLASS)

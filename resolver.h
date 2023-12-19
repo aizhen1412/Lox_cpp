@@ -24,16 +24,10 @@ public:
         SUBCLASS
     };
 
-    ClassType currentClass = ClassType::NONE_CLASS;
-
-    Interpreter *interpreter;
-    std::stack<std::map<std::string, bool>> scopes;
-    FunctionType currentFunction = FunctionType::NONE;
-
     Resolver(Interpreter *interpreter);
 
     Object VisitBlockStmt(Block &stmt) override;
-    Object VisitClassStmt(Class &stmt);
+    Object VisitClassStmt(Class &stmt) override;
     Object VisitExpressionStmt(Expression &stmt) override;
     Object VisitFunctionStmt(Function &stmt) override;
     Object VisitIfStmt(If &stmt) override;
@@ -45,29 +39,15 @@ public:
     Object VisitAssignExpr(Assign &expr) override;
     Object VisitBinaryExpr(Binary &expr) override;
     Object VisitCallExpr(Call &expr) override;
-    Object VisitGetExpr(Get &expr); // 应该是这里的问题，interpreter没有Expr这个字母
+    Object VisitGetExpr(Get &expr) override;
     Object VisitGroupingExpr(Grouping &expr) override;
     Object VisitLiteralExpr(Literal &expr) override;
     Object VisitLogicalExpr(Logical &expr) override;
-    Object VisitSetExpr(Set &expr);
-    Object VisitSuperExpr(Super &expr)
-    {
-        if (currentClass == ClassType::NONE_CLASS)
-        {
-            Error::ErrorFind(expr.keyword,
-                             "Can't use 'super' outside of a class.");
-        }
-        else if (currentClass != ClassType::SUBCLASS)
-        {
-            Error::ErrorFind(expr.keyword,
-                             "Can't use 'super' in a class with no superclass.");
-        }
-        ResolveLocal(&expr, expr.keyword);
-        return nullptr;
-    }
+    Object VisitSetExpr(Set &expr) override;
+    Object VisitSuperExpr(Super &expr) override;
     Object VisitThisExpr(This &expr) override;
     Object VisitUnaryExpr(Unary &expr) override;
-    Object VisitVariableExpr(Variable *expr);
+    Object VisitVariableExpr(Variable *expr) override;
     void Resolve(std::vector<Stmt *> statements);
     void Resolve(Stmt *stmt);
     void Resolve(Expr *expr);
@@ -77,5 +57,11 @@ public:
     void Declare(const Token &name);
     void Define(Token &name);
     void ResolveLocal(Expr *expr, const Token &name);
+
+    ClassType currentClass = ClassType::NONE_CLASS;
+
+    Interpreter *interpreter;
+    std::stack<std::map<std::string, bool>> scopes;
+    FunctionType currentFunction = FunctionType::NONE;
 };
 #endif // RESOLVER_H

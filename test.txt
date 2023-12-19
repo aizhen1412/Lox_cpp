@@ -4,7 +4,7 @@ class Animal {
   }
 }
 
-class Dog < Animal {
+class Dog < Dog {
   speak() {
     print "Woof!";
   }
