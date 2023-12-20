@@ -6,7 +6,7 @@
 
 int main(int argc, char const *argv[])
 {
-    argc = 2; // test
+    argc = 1; // test
     if (argc > 2)
     {
         std::cerr << "Usage: ./cpplox [script]" << std::endl;
@@ -22,4 +22,4 @@ int main(int argc, char const *argv[])
 
         return 0;
     }
-} // 12.6
+} 

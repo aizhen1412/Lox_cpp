@@ -30,7 +30,7 @@ void Parser::Synchronize()
             return;
 
         switch (Peek().type)
-        { // 如果不是分号，就跳过
+        {
         case CLASS:
         case FUN:
         case VAR:
@@ -136,13 +136,12 @@ Expr *Parser::Assignment()
         }
         else if (auto getExpr = dynamic_cast<Get *>(expr))
         {
-            // Get get = (Get)getExpr;
             return new Set(getExpr->object, getExpr->name, value);
 
             Error(equals, "Invalid assignment target.");
         }
-    }            // return expr;
-    return expr; //}这样是错的，搞了我三天没找到!!!
+    } // return expr;这样是错的，搞了我三天没找到!!!
+    return expr;
 }
 Expr *Parser::Or()
 {

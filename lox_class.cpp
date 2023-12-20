@@ -22,7 +22,6 @@ LoxFunction *LoxClass::FindMethod(std::string name)
 }
 Object LoxClass::Call(Interpreter *interpreter, std::vector<Object> arguments)
 {
-    // std::cout << "LoxClass::call" << std::endl;
     LoxInstance *instance = new LoxInstance(this);
     LoxFunction *initializer = FindMethod("init");
     if (initializer != nullptr)

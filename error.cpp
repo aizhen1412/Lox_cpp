@@ -21,7 +21,7 @@ void Error::ErrorFind(Token token, std::string message)
 }
 void Error::ProcessRuntimeError(RuntimeError error)
 {
-    std::cout << "[line " + std::to_string(error.token.line) + "] RuntimeError" << std::endl;
+    std::cout << "[line " + std::to_string(error.token.line) + "] RuntimeError." << std::endl;
 
     had_runtime_error = true;
 }

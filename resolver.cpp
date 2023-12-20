@@ -222,21 +222,8 @@ void Resolver::ResolveFunction(Function *function, FunctionType type)
 
     FunctionType enclosingFunction = currentFunction;
     currentFunction = type;
-    // std::stack<std::map<std::string, bool>> temp;
-    // temp = scopes;
-    // while (!temp.empty())
-    // {
-    //     std::map<std::string, bool> currentScope = temp.top();
-    //     temp.pop();
 
-    //     // 打印当前作用域的内容
-    //     for (const auto &entry : currentScope)
-    //     {
-    //         std::cout << entry.first << ": " << entry.second << std::endl;
-    //     }
-    //     std::cout << "------" << std::endl;
-    // }
-    BeginScope(); // 这里进去scopes变为空了
+    BeginScope();
     for (Token param : function->params)
     {
         Declare(param);
@@ -244,74 +231,16 @@ void Resolver::ResolveFunction(Function *function, FunctionType type)
     }
 
     Resolve(function->body);
-
-    // temp = scopes;
-    // while (!temp.empty()) // 这里少一个
-    // {
-    //     std::map<std::string, bool> currentScope = temp.top();
-    //     temp.pop();
-
-    //     // 打印当前作用域的内容
-    //     for (const auto &entry : currentScope)
-    //     {
-    //         std::cout << entry.first << ": " << entry.second << std::endl;
-    //     }
-    //     std::cout << "------" << std::endl;
-    // }
     EndScope();
     currentFunction = enclosingFunction;
 }
 void Resolver::BeginScope()
 {
-    // std::stack<std::map<std::string, bool>> temp;
-    // temp = scopes;
-    // while (!temp.empty()) // 这里少一个
-    // {
-    //     std::map<std::string, bool> currentScope = temp.top();
-    //     temp.pop();
-
-    //     // 打印当前作用域的内容
-    //     for (const auto &entry : currentScope)
-    //     {
-    //         std::cout << entry.first << ": " << entry.second << std::endl;
-    //     }
-    //     std::cout << "------" << std::endl;
-    // }
     std::map<std::string, bool> newScope;
     scopes.push(newScope);
-
-    // temp = scopes;
-    // while (!temp.empty()) // 这里少一个
-    // {
-    //     std::map<std::string, bool> currentScope = temp.top();
-    //     temp.pop();
-
-    //     // 打印当前作用域的内容
-    //     for (const auto &entry : currentScope)
-    //     {
-    //         std::cout << entry.first << ": " << entry.second << std::endl;
-    //     }
-    //     std::cout << "------" << std::endl;
-    // }
 }
 void Resolver::EndScope()
 {
-    // std::stack<std::map<std::string, bool>> temp;
-    // // 复制scopes
-    // temp = scopes;
-    // while (!temp.empty()) // 这里少一个
-    // {
-    //     std::map<std::string, bool> currentScope = temp.top();
-    //     temp.pop();
-
-    //     // 打印当前作用域的内容
-    //     for (const auto &entry : currentScope)
-    //     {
-    //         std::cout << entry.first << ": " << entry.second << std::endl;
-    //     }
-    //     std::cout << "------" << std::endl;
-    // }
-
     scopes.pop();
 }
 void Resolver::Declare(const Token &name)
@@ -333,22 +262,8 @@ void Resolver::Define(Token &name)
 {
     if (scopes.empty())
         return;
-    //  std::cout << name.lexeme << std::endl;
-    scopes.top()[name.lexeme] = true;
-    // std::stack<std::map<std::string, bool>> temp;
-    // temp = scopes;
-    // while (!temp.empty()) // 这里少一个
-    // {
-    //     std::map<std::string, bool> currentScope = temp.top();
-    //     temp.pop();
 
-    //     // 打印当前作用域的内容
-    //     for (const auto &entry : currentScope)
-    //     {
-    //         std::cout << entry.first << ": " << entry.second << std::endl;
-    //     }
-    //     std::cout << "------" << std::endl;
-    // }
+    scopes.top()[name.lexeme] = true;
 }
 void Resolver::ResolveLocal(Expr *expr, const Token &name)
 {
@@ -357,14 +272,10 @@ void Resolver::ResolveLocal(Expr *expr, const Token &name)
     for (int i = temp.size() - 1; i >= 0; i--)
     {
         const std::map<std::string, bool> &currentScope = scopes.top();
-        // 打印scopes
-        // for (auto it = currentScope.begin(); it != currentScope.end(); it++)
-        // {
-        //     std::cout << it->first << " " << it->second << std::endl;
-        // }
+
 
         auto it = currentScope.find(name.lexeme);
-        //  std::cout << name.lexeme << std::endl;
+
         if (it != currentScope.end())
         {
             interpreter->Resolve(expr, temp.size() - 1 - i);
@@ -374,50 +285,4 @@ void Resolver::ResolveLocal(Expr *expr, const Token &name)
         scopes.pop();
     }
     scopes = temp; // 恢复scopes
-
-    // std::stack<std::map<std::string, bool>> temp;
-    // temp = scopes;
-    // while (!scopes.empty())
-    // {
-    //     std::map<std::string, bool> currentScope = temp.top();
-    //     temp.pop();
-
-    //     // 打印当前作用域的内容
-    //     for (const auto &entry : currentScope)
-    //     {
-    //         std::cout << entry.first << ": " << entry.second << std::endl;
-    //     }
-    //     std::cout << "------" << std::endl;
-    // }
-    // std::stack<std::map<std::string, bool>> temp;
-    //  复制scopes
-    // temp = scopes;
-
-    // for (int i = temp.size() - 1; i >= 0; i--) //
-    // {
-    //     // 得到第i层的scopes
-    //     scopes = temp;
-
-    //     for (int j = 0; j < i; j++)
-    //     {
-    //         scopes.pop();
-    //     }
-
-    //     const std::map<std::string, bool> &currentScope = scopes.top();
-    //     // 打印scopes
-    //     for (auto it = currentScope.begin(); it != currentScope.end(); it++)
-    //     {
-    //         std::cout << it->first << " " << it->second << std::endl;
-    //     }
-
-    //     auto it = currentScope.find(name.lexeme);
-    //     std::cout << name.lexeme << std::endl;
-    //     if (it != currentScope.end())
-    //     {
-    //         interpreter->resolve(expr, temp.size() - 1 - i);
-    //         scopes = temp; // 忘了加这一句
-    //         return;
-    //     }
-    // }
-    // scopes = temp; // 恢复scopes
 }

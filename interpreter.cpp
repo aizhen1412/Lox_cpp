@@ -60,15 +60,8 @@ Object Interpreter::VisitGetExpr(Get &expr)
 }
 Object Interpreter::VisitSetExpr(Set &expr)
 {
-    //  std::cout << "set" << expr.value << std::endl;
 
     Object object = Evaluate(expr.object); // right
-    //   Object object = Evaluate(expr.value); // test
-
-    // if ((std::holds_alternative<double>(object)))
-    // {
-    //     std::cout << std::get<double>(object) << std::endl;
-    // }
     if (!(std::holds_alternative<LoxInstance *>(object)))
     {
         throw RuntimeError(expr.name,
@@ -101,7 +94,6 @@ Object Interpreter::VisitUnaryExpr(Unary &expr)
 }
 Object Interpreter::VisitVariableExpr(Variable *expr)
 {
-    // return environment->get(expr.name); // retbool
     return LookUpVariable(expr->name, expr);
 }
 Object Interpreter::LookUpVariable(Token name, Expr *expr)
@@ -125,9 +117,7 @@ Object Interpreter::VisitGroupingExpr(Grouping &expr)
 Object Interpreter::VisitBinaryExpr(Binary &expr)
 {
     Object left = Evaluate(expr.left);
-    //  std::cout << "left" << std::get<double>(left) << std::endl;
     Object right = Evaluate(expr.right);
-    // std::cout << "right" << std::get<double>(right) << std::endl;
 
     switch (expr.op.type)
     {
@@ -283,16 +273,12 @@ void Interpreter::Resolve(Expr *expr, int depth)
 }
 void Interpreter::ExecuteBlock(std::vector<Stmt *> statements, Environment *environment)
 {
-    // std::cout << "call executeBlock " << std::endl;
     Environment *previous = this->environment;
-    // std::cout << "first" << std::get<double>(previous->values["n"]) << std::endl;
     try
     {
         this->environment = environment; // 切换环境
         for (auto statement : statements)
         {
-            // std::cout << "environment->values[\" n \"] " << std::get<double>(environment->values["n"]) << std::endl;
-            // test();
             Execute(statement);
         }
     }
@@ -316,10 +302,6 @@ Object Interpreter::VisitClassStmt(Class &stmt)
     if (stmt.superclass != nullptr) // here is nullptr
     {
         superclass = Evaluate(stmt.superclass);
-        // if ((std::holds_alternative<std::nullptr_t>(superclass)))
-        // {
-        //     std::cout << "superclass == null" << std::endl;
-        // }
         if (!(std::holds_alternative<LoxClass *>(superclass)))
         {
             throw RuntimeError(stmt.superclass->name, "Superclass must be a class.");
@@ -379,7 +361,6 @@ Object Interpreter::VisitIfStmt(If &stmt)
 Object Interpreter::VisitPrintStmt(Print &stmt)
 {
     Object value = Evaluate(stmt.expression);
-    // 第三次
     std::cout << Stringify(value) << std::endl;
     return nullptr;
 }
@@ -390,7 +371,7 @@ Object Interpreter::VisitReturnStmt(Return &stmt)
     {
         value = Evaluate(stmt.value);
     }
-    //  std::cout << "call return " << std::endl;
+
     throw Return_method(value);
 
     return nullptr;
@@ -453,11 +434,6 @@ std::string Interpreter::Stringify(Object object)
     else if (std::holds_alternative<double>(object))
     {
         std::string text = std::to_string(std::get<double>(object));
-        // Remove ".0" from integer-valued Doubles.
-        // if (text.length() >= 2 && text.substr(text.length() - 2) == ".0")
-        // {
-        //     text = text.substr(0, text.length() - 2);
-        // }
 
         size_t dotPosition = text.find('.');
         if (dotPosition != std::string::npos)

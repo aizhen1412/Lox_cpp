@@ -42,7 +42,6 @@ void Environment::Define(const std::string &name, Object value)
 }
 Object Environment::GetAt(int distance, std::string name)
 {
-    //  std::cout << "name " << name << std::endl;
     return Ancestor(distance)->values[name];
 }
 void Environment::AssignAt(int distance, Token name, Object value)
@@ -51,25 +50,11 @@ void Environment::AssignAt(int distance, Token name, Object value)
 }
 Environment *Environment::Ancestor(int distance)
 {
-    // std::cout << distance << std::endl;
     Environment *environment = this;
-    //  std::cout << "environment " << environment << std::endl;
     for (int i = 0; i < distance; i++)
     {
         environment = environment->enclosing;
     }
-    // 打印values
-    // for (auto it = environment->values.begin(); it != environment->values.end(); it++)
-    // {
-    //     std::cout << it->first << " " << it->second << std::endl;
-    // }
-    // 判断environment->values["n"]是否为double
-    // if (std::holds_alternative<double>(environment->values["n"]) == true)
-    // {
-    //     std::cout << "n is double" << std::endl;
-    //     std::cout << std::get<double>(environment->values["n"]) << std::endl;
-    // }
 
-    //  std::cout << environment->values["n"] << std::endl;
     return environment;
 }
