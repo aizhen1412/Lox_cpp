@@ -10,9 +10,10 @@ std::string LoxClass::ToString()
 }
 LoxFunction *LoxClass::FindMethod(std::string name)
 {
-    if (auto it = methods.find(name) != methods.end())
+    auto it = methods.find(name);
+    if (it != methods.end())
     {
-        return methods[name];
+        return it->second;
     }
     if (superclass != nullptr)
     {

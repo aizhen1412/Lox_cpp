@@ -14,7 +14,7 @@ LoxFunction *LoxFunction::Bind(LoxInstance *instance)
 Object LoxFunction::Call(Interpreter *interpreter, std::vector<Object> arguments)
 {
     Environment *environment = new Environment(closure);
-    for (int i = 0; i < declaration.params.size(); i++)
+    for (std::vector<Token>::size_type i = 0; i < declaration.params.size(); i++)
     {
         environment->Define(declaration.params[i].lexeme, arguments[i]);
     }

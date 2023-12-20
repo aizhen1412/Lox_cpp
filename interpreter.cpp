@@ -87,6 +87,8 @@ Object Interpreter::VisitUnaryExpr(Unary &expr)
     case MINUS:
         CheckNumberOperand(expr.op, right);
         return -std::get<double>(right);
+    default:
+        break;
     }
 
     // Unreachable.
@@ -158,6 +160,8 @@ Object Interpreter::VisitBinaryExpr(Binary &expr)
         return !IsEqual(left, right);
     case EQUAL_EQUAL:
         return IsEqual(left, right);
+    default:
+        break;
     }
 
     // Unreachable.
@@ -181,7 +185,7 @@ Object Interpreter::VisitCallExpr(Call &expr)
             throw RuntimeError(expr.paren, "Can only call functions and classes.");
         }
         LoxCallable *function = std::get<LoxCallable *>(callee);
-        if (arguments_.size() != function->Arity())
+        if (static_cast<int>(arguments_.size()) != function->Arity())
         {
             throw RuntimeError(expr.paren, "Expected " + std::to_string(function->Arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
         }
@@ -195,7 +199,7 @@ Object Interpreter::VisitCallExpr(Call &expr)
             throw RuntimeError(expr.paren, "Can only call functions and classes.");
         }
         LoxCallable *function = std::get<LoxCallable *>(callee);
-        if (arguments_.size() != function->Arity()) // arity() 返回函数的参数个数
+        if (static_cast<int>(arguments_.size()) != function->Arity()) // Cast the size of arguments_ to int
         {
             throw RuntimeError(expr.paren, "Expected " + std::to_string(function->Arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
         }

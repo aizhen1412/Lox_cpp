@@ -40,6 +40,8 @@ void Parser::Synchronize()
         case PRINT:
         case RETURN:
             return;
+        default:
+            break;
         }
 
         Advance();
@@ -495,7 +497,7 @@ bool Parser::IsAtEnd()
 
 Token Parser::Peek()
 {
-    if (current >= tokens.size())
+    if (static_cast<size_t>(current) >= tokens.size())
     {
         return Token(END_OF_FILE, "", nullptr, tokens[current - 1].line);
     }
