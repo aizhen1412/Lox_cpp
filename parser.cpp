@@ -12,7 +12,7 @@ Parser::Parser(std::vector<Token> tokens)
 
 std::vector<Stmt *> Parser::Parse() // 解析表达式
 {
-    std::vector<Stmt *> statements;
+    std::vector<Stmt *> statements; // 存储语句指针的容器
     while (!IsAtEnd())
     {
         statements.push_back(Declaration());
@@ -472,7 +472,7 @@ Token Parser::Consume(TokenType type, std::string message)
 
 Parser::ParseError Parser::Error(Token token, std::string message)
 {
-    Error::ErrorFind(token, message);
+    Error::ReportError(token, message);
     return ParseError();
 }
 

@@ -13,5 +13,6 @@ class LoxCallable
 public:
     virtual Object Call(Interpreter *interpreter, std::vector<Object> arguments) = 0;
     virtual int Arity() = 0;
+    virtual ~LoxCallable() {}
 };
 #endif // VISIT_CALL_EXPR_H

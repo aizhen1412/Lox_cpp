@@ -22,7 +22,7 @@ Object Resolver::VisitClassStmt(Class &stmt)
     Define(stmt.name);
     if (stmt.superclass != nullptr && stmt.name.lexeme == stmt.superclass->name.lexeme)
     {
-        Error::ErrorFind(stmt.superclass->name, "A class can't inherit from itself.");
+        Error::ReportError(stmt.superclass->name, "A class can't inherit from itself.");
     }
     if (stmt.superclass != nullptr)
     {
@@ -82,14 +82,14 @@ Object Resolver::VisitReturnStmt(Return &stmt)
 {
     if (currentFunction == FunctionType::NONE)
     {
-        Error::ErrorFind(stmt.keyword, "Can't return from top-level code.");
+        Error::ReportError(stmt.keyword, "Can't return from top-level code.");
     }
     if (stmt.value != nullptr)
     {
         if (currentFunction == FunctionType::INITIALIZER)
         {
-            Error::ErrorFind(stmt.keyword,
-                             "Can't return a value from an initializer.");
+            Error::ReportError(stmt.keyword,
+                               "Can't return a value from an initializer.");
         }
         Resolve(stmt.value);
     }
@@ -166,13 +166,13 @@ Object Resolver::VisitSuperExpr(Super &expr)
 {
     if (currentClass == ClassType::NONE_CLASS)
     {
-        Error::ErrorFind(expr.keyword,
-                         "Can't use 'super' outside of a class.");
+        Error::ReportError(expr.keyword,
+                           "Can't use 'super' outside of a class.");
     }
     else if (currentClass != ClassType::SUBCLASS)
     {
-        Error::ErrorFind(expr.keyword,
-                         "Can't use 'super' in a class with no superclass.");
+        Error::ReportError(expr.keyword,
+                           "Can't use 'super' in a class with no superclass.");
     }
     ResolveLocal(&expr, expr.keyword);
     return nullptr;
@@ -181,7 +181,7 @@ Object Resolver::VisitThisExpr(This &expr)
 {
     if (currentClass == ClassType::NONE_CLASS)
     {
-        Error::ErrorFind(expr.keyword, "Can't use 'this' outside of a class.");
+        Error::ReportError(expr.keyword, "Can't use 'this' outside of a class.");
         return nullptr;
     }
     ResolveLocal(&expr, expr.keyword);
@@ -196,7 +196,7 @@ Object Resolver::VisitVariableExpr(Variable *expr)
 {
     if (!scopes.empty() && !scopes.top().empty() && scopes.top().find(expr->name.lexeme) != scopes.top().end() && scopes.top().find(expr->name.lexeme)->second == false)
     {
-        Error::ErrorFind(expr->name, "Can't read local variable in its own initializer.");
+        Error::ReportError(expr->name, "Can't read local variable in its own initializer.");
     }
 
     ResolveLocal(expr, expr->name);
@@ -254,7 +254,7 @@ void Resolver::Declare(const Token &name)
     auto ret = scope.find(name.lexeme);
     if (ret != scope.end()) //
     {
-        Error::ErrorFind(name, "Already variable with this name in this scope.");
+        Error::ReportError(name, "Already variable with this name in this scope.");
     }
     scope[name.lexeme] = false;
 }
@@ -272,7 +272,6 @@ void Resolver::ResolveLocal(Expr *expr, const Token &name)
     for (int i = temp.size() - 1; i >= 0; i--)
     {
         const std::map<std::string, bool> &currentScope = scopes.top();
-
 
         auto it = currentScope.find(name.lexeme);
 

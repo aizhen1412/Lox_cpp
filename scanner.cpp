@@ -99,7 +99,7 @@ void Scanner::ScanToken() // 扫描词法单元
         }
         else
         {
-            Error::ErrorFind(line, "Unexpected character.");
+            Error::ReportError(line, "Unexpected character.");
         }
         break;
     }
@@ -189,7 +189,7 @@ void Scanner::String() // 处理字符串
 
     if (IsAtEnd())
     {
-        Error::ErrorFind(line, "Unterminated string.");
+        Error::ReportError(line, "Unterminated string.");
         return;
     }
 

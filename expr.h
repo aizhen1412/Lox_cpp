@@ -29,19 +29,19 @@ class Return;
 class Var;
 class While;
 
-class Expr
+class Expr // 表达式
 {
 public:
   virtual ~Expr() {}
   virtual Object Accept(Visitor &visitor) = 0;
 };
-class Stmt
+class Stmt // 语句
 {
 public:
   virtual ~Stmt() = default;
   virtual Object Accept(Visitor &visitor) = 0;
 };
-class Visitor
+class Visitor // 访问者
 {
 public:
   virtual Object VisitAssignExpr(Assign &Expr) = 0;
@@ -68,7 +68,7 @@ public:
   virtual Object VisitWhileStmt(While &stmt) = 0;
 };
 
-class Assign : public Expr
+class Assign : public Expr // 赋值表达式
 {
 public:
   Assign(Token name, Expr *value);
@@ -77,7 +77,7 @@ public:
   Expr *value;
 };
 
-class Binary : public Expr
+class Binary : public Expr // 二元表达式
 {
 public:
   Binary(Expr *left, Token op, Expr *right);
@@ -87,7 +87,7 @@ public:
   Expr *right;
 };
 
-class Call : public Expr
+class Call : public Expr // 函数调用表达式
 {
 public:
   Call(Expr *callee, Token paren, std::vector<Expr *> arguments);
@@ -97,7 +97,7 @@ public:
   std::vector<Expr *> arguments;
 };
 
-class Get : public Expr
+class Get : public Expr // 获取属性表达式
 {
 public:
   Get(Expr *object, Token name);
@@ -106,7 +106,7 @@ public:
   Token name;
 };
 
-class Grouping : public Expr
+class Grouping : public Expr // 分组表达式
 {
 public:
   Grouping(Expr *expression);
@@ -114,7 +114,7 @@ public:
   Expr *expression;
 };
 
-class Literal : public Expr
+class Literal : public Expr // 字面量表达式
 {
 public:
   Literal(Object value);
@@ -122,7 +122,7 @@ public:
   Object value;
 };
 
-class Logical : public Expr
+class Logical : public Expr // 逻辑表达式
 {
 public:
   Logical(Expr *left, Token op, Expr *right);
@@ -132,7 +132,7 @@ public:
   Expr *right;
 };
 
-class Set : public Expr
+class Set : public Expr // 设置属性表达式
 {
 public:
   Set(Expr *object, Token name, Expr *value);
@@ -142,7 +142,7 @@ public:
   Expr *value;
 };
 
-class Super : public Expr
+class Super : public Expr // super表达式
 {
 public:
   Super(Token keyword, Token method);
@@ -151,7 +151,7 @@ public:
   Token method;
 };
 
-class This : public Expr
+class This : public Expr // this表达式
 {
 public:
   This(Token keyword);
@@ -159,7 +159,7 @@ public:
   Token keyword;
 };
 
-class Unary : public Expr
+class Unary : public Expr // 一元表达式
 {
 public:
   Unary(Token op, Expr *right);
@@ -168,7 +168,7 @@ public:
   Expr *right;
 };
 
-class Variable : public Expr
+class Variable : public Expr // 变量表达式
 {
 public:
   Variable(Token name);
@@ -176,7 +176,7 @@ public:
   Token name;
 };
 
-class Block : public Stmt
+class Block : public Stmt // 代码块
 {
 public:
   Block(std::vector<Stmt *> statements) : statements(statements) {}
@@ -196,7 +196,7 @@ public:
   std::vector<Stmt *> statements;
 };
 
-class Class : public Stmt
+class Class : public Stmt // 类
 {
 public:
   Class(Token name, Variable *superclass, std::vector<Function *> &methods)
@@ -212,7 +212,7 @@ public:
   std::vector<Function *> methods;
 };
 
-class Expression : public Stmt
+class Expression : public Stmt // 表达式语句
 {
 public:
   Expression(Expr *expression) : expression(expression) {}
@@ -229,7 +229,7 @@ public:
   Expr *expression;
 };
 
-class Function : public Stmt
+class Function : public Stmt // 函数
 {
 public:
   Function() = default;
@@ -245,7 +245,7 @@ public:
   std::vector<Stmt *> body;
 };
 
-class If : public Stmt
+class If : public Stmt // if语句
 {
 public:
   If(Expr *condition, Stmt *thenBranch, Stmt *elseBranch)
@@ -269,7 +269,7 @@ public:
   Stmt *elseBranch;
 };
 
-class Print : public Stmt
+class Print : public Stmt // print语句
 {
 public:
   Print(Expr *expression) : expression(expression) {}
@@ -286,7 +286,7 @@ public:
   Expr *expression;
 };
 
-class Return : public Stmt
+class Return : public Stmt // return语句
 {
 public:
   Return(Token keyword, Expr *value) : keyword(keyword), value(value) {}
@@ -304,7 +304,7 @@ public:
   Expr *value;
 };
 
-class Var : public Stmt
+class Var : public Stmt // var语句
 {
 public:
   Var(Token name, Expr *initializer) : name(name), initializer(initializer) {}
@@ -322,7 +322,7 @@ public:
   Expr *initializer;
 };
 
-class While : public Stmt
+class While : public Stmt // while语句
 {
 public:
   While(Expr *condition, Stmt *body) : condition(condition), body(body) {}

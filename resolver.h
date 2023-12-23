@@ -10,6 +10,10 @@
 class Resolver : public Interpreter
 {
 public:
+    Resolver(Interpreter *interpreter);
+    void Resolve(std::vector<Stmt *> statements);
+
+private:
     enum FunctionType
     {
         NONE,
@@ -24,7 +28,10 @@ public:
         SUBCLASS
     };
 
-    Resolver(Interpreter *interpreter);
+    ClassType currentClass = ClassType::NONE_CLASS;
+    FunctionType currentFunction = FunctionType::NONE;
+    Interpreter *interpreter;
+    std::stack<std::map<std::string, bool>> scopes;
 
     Object VisitBlockStmt(Block &stmt) override;
     Object VisitClassStmt(Class &stmt) override;
@@ -48,7 +55,7 @@ public:
     Object VisitThisExpr(This &expr) override;
     Object VisitUnaryExpr(Unary &expr) override;
     Object VisitVariableExpr(Variable *expr) override;
-    void Resolve(std::vector<Stmt *> statements);
+
     void Resolve(Stmt *stmt);
     void Resolve(Expr *expr);
     void ResolveFunction(Function *function, FunctionType type);
@@ -57,11 +64,5 @@ public:
     void Declare(const Token &name);
     void Define(Token &name);
     void ResolveLocal(Expr *expr, const Token &name);
-
-    ClassType currentClass = ClassType::NONE_CLASS;
-
-    Interpreter *interpreter;
-    std::stack<std::map<std::string, bool>> scopes;
-    FunctionType currentFunction = FunctionType::NONE;
 };
 #endif // RESOLVER_H

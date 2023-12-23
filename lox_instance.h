@@ -11,8 +11,10 @@ public:
     LoxInstance(LoxClass *klass);
     void Set(Token name, Object value);
     Object Get(Token name);
+
     std::string ToString();
 
+private:
     LoxClass *klass;
     std::unordered_map<std::string, Object> fields;
 };

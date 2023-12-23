@@ -4,11 +4,11 @@
 bool had_error = false;
 bool had_runtime_error = false;
 
-void Error::ErrorFind(int line, std::string message)
+void Error::ReportError(int line, std::string message)
 {
     Report(line, "", message);
 }
-void Error::ErrorFind(Token token, std::string message)
+void Error::ReportError(Token token, std::string message)
 {
     if (token.type == TokenType::END_OF_FILE)
     {

@@ -3,7 +3,11 @@
 #include "interpreter.h"
 
 LoxClass::LoxClass(std::string name, LoxClass *superclass, std::unordered_map<std::string, LoxFunction *> methods) : name(name), superclass(superclass), methods(methods) {}
-
+LoxClass::~LoxClass()
+{
+    for (auto it = methods.begin(); it != methods.end(); it++)
+        delete it->second;
+}
 std::string LoxClass::ToString()
 {
     return name;
@@ -23,11 +27,13 @@ LoxFunction *LoxClass::FindMethod(std::string name)
 }
 Object LoxClass::Call(Interpreter *interpreter, std::vector<Object> arguments)
 {
-    LoxInstance *instance = new LoxInstance(this);
+    LoxInstance *instance = new LoxInstance(this); // instance在environment的析构函数中会被delete
     LoxFunction *initializer = FindMethod("init");
     if (initializer != nullptr)
     {
-        initializer->Bind(instance)->Call(interpreter, arguments);
+        LoxFunction *temp = initializer->Bind(instance);
+        temp->Call(interpreter, arguments);
+        delete temp;
     }
     return instance;
 }
@@ -38,4 +44,8 @@ int LoxClass::Arity()
     if (initializer == nullptr)
         return 0;
     return initializer->Arity();
+}
+std::string LoxClass::Get_name()
+{
+    return name;
 }

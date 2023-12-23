@@ -10,8 +10,8 @@ extern bool had_runtime_error;
 class Error
 {
 public:
-    static void ErrorFind(int line, std::string message);
-    static void ErrorFind(Token token, std::string message);
+    static void ReportError(int line, std::string message);
+    static void ReportError(Token token, std::string message);
     static void ProcessRuntimeError(RuntimeError error);
 
 private:

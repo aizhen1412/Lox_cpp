@@ -10,6 +10,20 @@ Environment::Environment(Environment *enclosing)
 {
     this->enclosing = enclosing;
 }
+Environment::~Environment()
+{
+    delete enclosing;
+    for (auto it = values.begin(); it != values.end(); it++)
+    {
+        std::visit([](auto &&arg)
+                   { using T = std::decay_t<decltype(arg)>;
+                    if constexpr (std::is_pointer_v<T>)
+                    {
+                        delete arg;
+                    } },
+                   it->second);
+    }
+}
 Object Environment::get(Token name)
 {
     if (values.find(name.lexeme) != values.end())
@@ -57,4 +71,13 @@ Environment *Environment::Ancestor(int distance)
     }
 
     return environment;
+}
+Environment *Environment::Get_enclosing()
+{
+    return enclosing;
+}
+Environment *Environment::Set_enclosing(Environment *enclosing)
+{
+    this->enclosing = enclosing;
+    return enclosing;
 }

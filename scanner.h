@@ -40,13 +40,13 @@ private:
         // 其他关键字
     };
 
-    void ScanToken();
-    char Peek();
-    char PeekNext();
-    char Advance();
-    void AddToken(TokenType type);
-    void AddToken(TokenType type, Object literal);
-    void Number();
+    void ScanToken();                              // 词法分析
+    char Peek();                                   // 查看下一个字符
+    char PeekNext();                               // 查看下下一个字符
+    char Advance();                                // 获取下一个字符
+    void AddToken(TokenType type);                 // 添加词法单元
+    void AddToken(TokenType type, Object literal); // 添加词法单元
+    void Number();                                 //
     void Identifier();
     void String();
     bool IsDigit(char c);

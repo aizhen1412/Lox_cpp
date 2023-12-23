@@ -9,17 +9,18 @@ class Interpreter;
 class LoxFunction : public LoxCallable
 {
 public:
-    Function declaration;
-    Environment *closure;
-
-    bool is_initializer;
-    LoxFunction();
+    LoxFunction(){};
     LoxFunction(Function declaration, Environment *closure, bool isInitializer);
-
+    ~LoxFunction();
+    LoxFunction *Bind(LoxInstance *instance);
     Object Call(Interpreter *interpreter, std::vector<Object> arguments);
     int Arity();
-    std::string ToString();
 
-    LoxFunction *Bind(LoxInstance *instance);
+private:
+    Function declaration;
+    Environment *closure;
+    bool is_initializer;
+
+    std::string ToString();
 };
 #endif // LOX_FUNCTION_H

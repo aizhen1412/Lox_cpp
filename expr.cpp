@@ -5,6 +5,7 @@
 #include "resolver.h"
 
 Assign::Assign(Token name, Expr *value) : name(name), value(value) {}
+
 Object Assign::Accept(Visitor &visitor)
 {
     return visitor.VisitAssignExpr(*this);

@@ -64,5 +64,9 @@ void Lox::Run(const std::string &source) // 运行源代码
 
     if (had_error)
         return;
+
     interpreter.Interpret(statements);
+
+    for (auto statement : statements)
+        delete statement;
 }

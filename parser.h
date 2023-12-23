@@ -17,6 +17,9 @@ public:
     };
 
 private:
+    int current = 0;
+    std::vector<Token> tokens;
+
     void Synchronize();
     Expr *ExpressionFun();
     Stmt *PrintStatement();
@@ -53,9 +56,6 @@ private:
     bool IsAtEnd();
     Token Peek();
     Token Previous();
-
-    int current = 0;
-    std::vector<Token> tokens;
 };
 
 #endif // PARSER_H

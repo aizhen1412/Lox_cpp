@@ -14,15 +14,14 @@ class LoxInstance;
 class Token
 {
 public:
-    Token() = default;
+    Token(){};
+    Token(TokenType type, const std::string lexeme, Object literal, int line);
+    std::string ToString() const;
 
     TokenType type;
     std::string lexeme;
     Object literal;
     int line;
-
-    Token(TokenType type, const std::string lexeme, Object literal, int line);
-    std::string ToString() const;
 };
 
 #endif // TOKEN_H

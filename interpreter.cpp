@@ -9,6 +9,14 @@
 #include "lox_class.h"
 #include "lox_instance.h"
 
+Interpreter::~Interpreter()
+{
+    // 如果globals和environment指向不同 那么删除
+    if (globals != environment)
+        delete environment;
+
+    delete globals;
+}
 Object Interpreter::VisitSuperExpr(Super &Expr)
 {
     int distance = locals[&Expr];
@@ -189,8 +197,9 @@ Object Interpreter::VisitCallExpr(Call &expr)
         {
             throw RuntimeError(expr.paren, "Expected " + std::to_string(function->Arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
         }
-
-        return function->Call(this, arguments_);
+        Object ret = function->Call(this, arguments_);
+        // delete function;
+        return ret;
     }
     else
     {
@@ -204,7 +213,9 @@ Object Interpreter::VisitCallExpr(Call &expr)
             throw RuntimeError(expr.paren, "Expected " + std::to_string(function->Arity()) + " arguments but got " + std::to_string(arguments_.size()) + ".");
         }
         LoxFunction *loxFunction = dynamic_cast<LoxFunction *>(function);
-        return loxFunction->Call(this, arguments_);
+        Object ret = loxFunction->Call(this, arguments_);
+        // delete function;
+        return ret;
     }
 }
 void Interpreter::CheckNumberOperand(Token op, Object operand) // 检查操作数是否为数字
@@ -296,45 +307,50 @@ void Interpreter::ExecuteBlock(std::vector<Stmt *> statements, Environment *envi
 }
 Object Interpreter::VisitBlockStmt(Block &stmt)
 {
-    ExecuteBlock(stmt.statements, new Environment(environment));
+    Environment *new_environment = new Environment(environment);
+
+    ExecuteBlock(stmt.statements, new_environment);
+
+    delete new_environment;
 
     return nullptr;
 }
 Object Interpreter::VisitClassStmt(Class &stmt)
 {
     Object superclass = nullptr;
-    if (stmt.superclass != nullptr) // here is nullptr
+    if (stmt.superclass != nullptr) // 存在父类
     {
         superclass = Evaluate(stmt.superclass);
+
         if (!(std::holds_alternative<LoxClass *>(superclass)))
-        {
             throw RuntimeError(stmt.superclass->name, "Superclass must be a class.");
-        }
     }
     environment->Define(stmt.name.lexeme, nullptr);
     if (stmt.superclass != nullptr)
     {
-        environment = new Environment(environment);
-        environment->Define("super", superclass);
+        environment = new Environment(environment); // 原来的环境保存在environment->enclosing中
+        environment->Define("super", superclass);   // 现在的environment是interpreter中的environment，会在interpreter的析构函数中被delete
     }
     std::unordered_map<std::string, LoxFunction *> methods;
     for (Function *method : stmt.methods)
     {
-        LoxFunction *function = new LoxFunction(*method, environment, (method->name.lexeme.compare("init") == 0));
+        LoxFunction *function = new LoxFunction(*method, environment, (method->name.lexeme.compare("init") == 0)); // function在LoxClass的析构函数中会被delete
         methods[method->name.lexeme] = function;
     }
 
     LoxClass *klass = nullptr;
-    if ((std::holds_alternative<std::nullptr_t>(superclass)))
+    if (std::holds_alternative<std::nullptr_t>(superclass)) // superclass == null
+    {                                                       // klass在environment的析构函数中会被delete
         klass = new LoxClass(stmt.name.lexeme, std::get<std::nullptr_t>(superclass), methods);
-    else
-        klass = new LoxClass(stmt.name.lexeme, std::get<LoxClass *>(superclass), methods);
-
-    if (!(std::holds_alternative<std::nullptr_t>(superclass))) // superclass != null
-    {
-        environment = environment->enclosing;
     }
-    environment->Assign(stmt.name, klass);
+    else
+    {
+        klass = new LoxClass(stmt.name.lexeme, std::get<LoxClass *>(superclass), methods);
+        environment = environment->Get_enclosing(); // 退出环境
+    }
+
+    environment->Assign(stmt.name, klass); // 将类名和类的映射关系存入环境中
+
     return nullptr;
 }
 Object Interpreter::VisitExpressionStmt(Expression &stmt)
@@ -344,7 +360,7 @@ Object Interpreter::VisitExpressionStmt(Expression &stmt)
 }
 Object Interpreter::VisitFunctionStmt(Function &stmt)
 {
-    LoxFunction *function = new LoxFunction(stmt, environment, false);
+    LoxFunction *function = new LoxFunction(stmt, environment, false); // function在environment的析构函数中会被delete
 
     LoxCallable *callable = function;
     environment->Define(stmt.name.lexeme, callable);
@@ -394,9 +410,8 @@ Object Interpreter::VisitVarStmt(Var &stmt)
 Object Interpreter::VisitWhileStmt(While &stmt)
 {
     while (IsTruthy(Evaluate(stmt.condition)))
-    {
         Execute(stmt.body);
-    }
+
     return nullptr;
 }
 Object Interpreter::VisitAssignExpr(Assign &expr)
@@ -420,9 +435,7 @@ void Interpreter::Interpret(std::vector<Stmt *> statements)
     try
     {
         for (const auto &statement : statements)
-        {
             Execute(statement);
-        }
     }
     catch (const RuntimeError &error)
     {
