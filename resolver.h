@@ -1,3 +1,9 @@
+/*
+ * resolver.h
+ * This file defines the Resolver class, which is used to resolve and handle the scope of variables and functions in the source code.
+ * The Resolver class is a subclass of the Interpreter class, and it overrides the visit methods for each type of statement and expression.
+ * The Resolver class includes methods for beginning and ending a scope, declaring and defining a variable, and resolving a local variable.
+ */
 #ifndef RESOLVER_H
 #define RESOLVER_H
 
@@ -31,8 +37,10 @@ private:
     ClassType currentClass = ClassType::NONE_CLASS;
     FunctionType currentFunction = FunctionType::NONE;
     Interpreter *interpreter;
+    // A stack of scopes, where each scope is a map from variable names to a boolean value.
+    // The boolean value indicates whether the variable has been initialized.
     std::stack<std::map<std::string, bool>> scopes;
-
+    // visitor methods
     Object VisitBlockStmt(Block &stmt) override;
     Object VisitClassStmt(Class &stmt) override;
     Object VisitExpressionStmt(Expression &stmt) override;
@@ -59,10 +67,10 @@ private:
     void Resolve(Stmt *stmt);
     void Resolve(Expr *expr);
     void ResolveFunction(Function *function, FunctionType type);
-    void BeginScope();
-    void EndScope();
-    void Declare(const Token &name);
-    void Define(Token &name);
-    void ResolveLocal(Expr *expr, const Token &name);
+    void BeginScope();                                // push a new scope onto the stack
+    void EndScope();                                  // pop the current scope off the stack
+    void Declare(const Token &name);                  // declare a variable in the current scope
+    void Define(Token &name);                         // mark a variable as initialized in the current scope
+    void ResolveLocal(Expr *expr, const Token &name); // resolve a local variable
 };
 #endif // RESOLVER_H

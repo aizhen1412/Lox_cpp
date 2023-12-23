@@ -1,3 +1,8 @@
+/*
+ * scanner.h
+ * This file defines the Scanner class, which is used to scan the source code and generate a list of tokens.
+ * The Scanner class includes methods for scanning individual tokens, checking the next character in the source code, and checking if the end of the source code has been reached.
+ */
 #ifndef SCANNER_H
 #define SCANNER_H
 
@@ -14,11 +19,11 @@ public:
     std::vector<Token> ScanTokens();
 
 private:
-    const std::string source;  // 源代码
-    std::vector<Token> tokens; // 词法单元列表
-    unsigned start = 0;        // 当前词法单元的起始位置
-    unsigned current = 0;      // 当前词法单元的结束位置
-    unsigned line = 1;         // 当前词法单元所在的行号
+    const std::string source;
+    std::vector<Token> tokens;
+    unsigned start = 0;
+    unsigned current = 0;
+    unsigned line = 1;
 
     std::unordered_map<std::string, TokenType> keywords = {
         {"and", TokenType::AND},
@@ -36,21 +41,19 @@ private:
         {"this", TokenType::THIS},
         {"true", TokenType::TRUE},
         {"var", TokenType::VAR},
-        {"while", TokenType::WHILE}
-        // 其他关键字
-    };
+        {"while", TokenType::WHILE}};
 
-    void ScanToken();                              // 词法分析
-    char Peek();                                   // 查看下一个字符
-    char PeekNext();                               // 查看下下一个字符
-    char Advance();                                // 获取下一个字符
-    void AddToken(TokenType type);                 // 添加词法单元
-    void AddToken(TokenType type, Object literal); // 添加词法单元
-    void Number();                                 //
+    void ScanToken(); // scan the source code and generate a list of tokens
+    char Peek();      // check the current character
+    char PeekNext();  // check the next character
+    char Advance();   // advance the current character
+    void AddToken(TokenType type);
+    void AddToken(TokenType type, Object literal);
+    void Number();
     void Identifier();
     void String();
     bool IsDigit(char c);
-    bool Match(const char expected);
+    bool Match(const char expected); // check if the current character matches the expected character
     bool IsAlpha(char c);
     bool IsAlphaNumeric(char c);
     bool IsAtEnd();

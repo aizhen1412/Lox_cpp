@@ -1,3 +1,34 @@
+/*
+ * interpreter.cpp
+ * This file implements the Interpreter class defined in interpreter.h.
+ * The Interpreter class is the core of the Lox language. It interprets and executes Lox code.
+ *
+ * The constructor initializes the interpreter with a new global environment and a new locals map.
+ *
+ * The destructor deletes the environments and the locals map.
+ *
+ * The Interpret method is the entry point of the interpreter. It takes a list of statements and interprets them. If an error occurs during interpretation, it is caught and reported.
+ *
+ * The ExecuteBlock method executes a block of statements in a given environment. It creates a new environment for the block, executes the statements in this environment, and then restores the previous environment.
+ *
+ * The Resolve method resolves a variable and stores its depth in the locals map.
+ *
+ * The Visit... methods are used to visit different types of expressions and statements. They evaluate expressions, execute statements, and handle control flow.
+ *
+ * The CheckNumberOperand and CheckNumberOperands methods check if the operand(s) of an operation are numbers. If not, they throw a RuntimeError.
+ *
+ * The IsTruthy method checks if an object is truthy according to the rules of the Lox language.
+ *
+ * The IsEqual method checks if two objects are equal.
+ *
+ * The Evaluate method evaluates an expression and returns its value.
+ *
+ * The Execute method executes a statement. If a return statement is encountered, it throws a Return exception.
+ *
+ * The LookUpVariable method looks up a variable in the environment. If the variable is not found, it throws a RuntimeError.
+ *
+ * The Stringify method converts an object to a string.
+ */
 #include <typeinfo>
 #include "interpreter.h"
 #include "error.h"
@@ -17,6 +48,42 @@ Interpreter::~Interpreter()
 
     delete globals;
 }
+void Interpreter::Interpret(std::vector<Stmt *> statements)
+{
+    try
+    {
+        for (const auto &statement : statements)
+            Execute(statement);
+    }
+    catch (const RuntimeError &error)
+    {
+        Error::ProcessRuntimeError(error);
+    }
+}
+void Interpreter::ExecuteBlock(std::vector<Stmt *> statements, Environment *environment)
+{
+    Environment *previous = this->environment;
+    try
+    {
+        this->environment = environment; // 切换环境
+        for (auto statement : statements)
+        {
+            Execute(statement);
+        }
+    }
+    catch (const Return_method &returnValue)
+    {
+        this->environment = previous;
+        throw returnValue;
+        return;
+    }
+    this->environment = previous; // 抛出return后这里不会执行
+}
+void Interpreter::Resolve(Expr *expr, int depth)
+{
+    locals[expr] = depth;
+}
+
 Object Interpreter::VisitSuperExpr(Super &Expr)
 {
     int distance = locals[&Expr];
@@ -106,19 +173,7 @@ Object Interpreter::VisitVariableExpr(Variable *expr)
 {
     return LookUpVariable(expr->name, expr);
 }
-Object Interpreter::LookUpVariable(Token name, Expr *expr)
-{
-    auto ret = locals.find(expr);
-    if (ret != locals.end())
-    {
-        int distance = ret->second;
-        return environment->GetAt(distance, name.lexeme); //
-    }
-    else
-    {
-        return globals->get(name);
-    }
-}
+
 Object Interpreter::VisitGroupingExpr(Grouping &expr)
 {
     return Evaluate(expr.expression);
@@ -224,7 +279,6 @@ void Interpreter::CheckNumberOperand(Token op, Object operand) // 检查操作�
         return;
     throw RuntimeError(op, "Operand must be a number.");
 }
-
 void Interpreter::CheckNumberOperands(Token op, Object left, Object right) // 检查操作数是否为数字
 {
     if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right))
@@ -232,7 +286,6 @@ void Interpreter::CheckNumberOperands(Token op, Object left, Object right) // �
 
     throw RuntimeError(op, "Operands must be numbers.");
 }
-
 bool Interpreter::IsTruthy(Object object)
 {
     if (std::holds_alternative<std::nullptr_t>(object))
@@ -241,7 +294,6 @@ bool Interpreter::IsTruthy(Object object)
         return std::get<bool>(object);
     return true;
 }
-
 bool Interpreter::IsEqual(Object a, Object b)
 {
     if (std::holds_alternative<std::nullptr_t>(a) && std::holds_alternative<std::nullptr_t>(b))
@@ -273,7 +325,6 @@ bool Interpreter::IsEqual(Object a, Object b)
 
     return false;
 }
-
 Object Interpreter::Evaluate(Expr *expr)
 {
     return expr->Accept(*this);
@@ -282,28 +333,18 @@ void Interpreter::Execute(Stmt *stmt)
 {
     stmt->Accept(*this);
 }
-void Interpreter::Resolve(Expr *expr, int depth)
+Object Interpreter::LookUpVariable(Token name, Expr *expr)
 {
-    locals[expr] = depth;
-}
-void Interpreter::ExecuteBlock(std::vector<Stmt *> statements, Environment *environment)
-{
-    Environment *previous = this->environment;
-    try
+    auto ret = locals.find(expr);
+    if (ret != locals.end())
     {
-        this->environment = environment; // 切换环境
-        for (auto statement : statements)
-        {
-            Execute(statement);
-        }
+        int distance = ret->second;
+        return environment->GetAt(distance, name.lexeme); //
     }
-    catch (const Return_method &returnValue)
+    else
     {
-        this->environment = previous;
-        throw returnValue;
-        return;
+        return globals->Get(name);
     }
-    this->environment = previous; // 抛出return后这里不会执行
 }
 Object Interpreter::VisitBlockStmt(Block &stmt)
 {
@@ -430,18 +471,6 @@ Object Interpreter::VisitAssignExpr(Assign &expr)
 
     return value;
 }
-void Interpreter::Interpret(std::vector<Stmt *> statements)
-{
-    try
-    {
-        for (const auto &statement : statements)
-            Execute(statement);
-    }
-    catch (const RuntimeError &error)
-    {
-        Error::ProcessRuntimeError(error);
-    }
-}
 
 std::string Interpreter::Stringify(Object object)
 {
@@ -487,7 +516,6 @@ std::string Interpreter::Stringify(Object object)
         LoxInstance *klass = std::get<LoxInstance *>(object);
         return klass->ToString();
     }
-
     else
         return std::get<std::string>(object);
 }

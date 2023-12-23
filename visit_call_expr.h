@@ -1,9 +1,12 @@
+/*
+ * visit_call_expr.h
+ * This file defines the LoxCallable interface, which represents a callable object in the Lox language.
+ * Each LoxCallable object must implement the Call method, which is used to call the object with a given list of arguments, and the Arity method, which returns the number of arguments that the object takes.
+ */
 #ifndef VISIT_CALL_EXPR_H
 #define VISIT_CALL_EXPR_H
 
 #include "token.h"
-#include "expr.h"
-#include <chrono>
 #include <vector>
 
 class Interpreter;

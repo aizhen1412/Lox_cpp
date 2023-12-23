@@ -1,3 +1,10 @@
+/*
+ * token.cpp
+ * This file implements the Token class defined in token.h.
+ * The Token class represents a lexical token in the source code.
+ * Each Token has a type, a lexeme, a literal value, and the line number where it was found in the source code.
+ * The Token class includes a method for converting a Token to a string for debugging purposes.
+ */
 #include <iostream>
 #include <variant>
 #include "token.h"
@@ -5,10 +12,7 @@
 #include "token_type_functions.h"
 
 Token::Token(TokenType type, const std::string lexeme, Object literal, int line)
-    : type(type), lexeme(lexeme), literal(literal), line(line)
-{
-    // 构造函数体为空，因为成员变量已经在初始化列表中初始化
-}
+    : type(type), lexeme(lexeme), literal(literal), line(line) {}
 
 std::string Token::ToString() const
 {

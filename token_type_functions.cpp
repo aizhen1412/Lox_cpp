@@ -1,3 +1,9 @@
+/*
+ * token_type_functions.cpp
+ * This file implements the TokenType2String function declared in token_type_functions.h.
+ * The TokenType2String function converts a TokenType enum value to a string.
+ * This function is used for debugging and error reporting purposes.
+ */
 #include "token_type_functions.h"
 
 std::string TokenType2String(TokenType tokenType)

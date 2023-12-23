@@ -1,3 +1,10 @@
+/*
+ * resolver.cpp
+ * This file implements the Resolver class defined in resolver.h.
+ * The Resolver class is used to resolve and handle the scope of variables and functions in the source code.
+ * The Resolver class is a subclass of the Interpreter class, and it overrides the visit methods for each type of statement and expression.
+ * The Resolver class includes methods for beginning and ending a scope, declaring and defining a variable, and resolving a local variable.
+ */
 #include "resolver.h"
 #include "error.h"
 #include "lox_instance.h"
@@ -6,6 +13,13 @@
 Resolver::Resolver(Interpreter *interpreter)
 {
     this->interpreter = interpreter;
+}
+void Resolver::Resolve(std::vector<Stmt *> statements)
+{
+    for (Stmt *statement : statements)
+    {
+        Resolve(statement);
+    }
 }
 Object Resolver::VisitBlockStmt(Block &stmt)
 {
@@ -202,13 +216,7 @@ Object Resolver::VisitVariableExpr(Variable *expr)
     ResolveLocal(expr, expr->name);
     return nullptr;
 }
-void Resolver::Resolve(std::vector<Stmt *> statements)
-{
-    for (Stmt *statement : statements)
-    {
-        Resolve(statement);
-    }
-}
+
 void Resolver::Resolve(Stmt *stmt)
 {
     stmt->Accept(*this);
@@ -246,16 +254,14 @@ void Resolver::EndScope()
 void Resolver::Declare(const Token &name)
 {
     if (scopes.empty())
-    {
         return;
-    }
 
     std::map<std::string, bool> &scope = scopes.top();
     auto ret = scope.find(name.lexeme);
-    if (ret != scope.end()) //
-    {
+
+    if (ret != scope.end())
         Error::ReportError(name, "Already variable with this name in this scope.");
-    }
+
     scope[name.lexeme] = false;
 }
 void Resolver::Define(Token &name)
@@ -278,10 +284,10 @@ void Resolver::ResolveLocal(Expr *expr, const Token &name)
         if (it != currentScope.end())
         {
             interpreter->Resolve(expr, temp.size() - 1 - i);
-            scopes = temp; // return之前要恢复scopes
+            scopes = temp;
             return;
         }
         scopes.pop();
     }
-    scopes = temp; // 恢复scopes
+    scopes = temp;
 }

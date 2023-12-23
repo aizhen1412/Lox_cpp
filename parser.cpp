@@ -1,9 +1,26 @@
+/*
+ * File: parser.cpp
+ * -----------------
+ * This file implements a parser for a custom language. The parser takes a vector of tokens
+ * as input and generates an abstract syntax tree (AST) as output. The AST is a hierarchical
+ * representation of the source code, which can be used for further processing such as
+ * interpretation or compilation.
+ *
+ * The parser uses recursive descent parsing, a top-down parsing technique that starts with
+ * the highest level of the grammar and recursively breaks it down into its constituent parts.
+ *
+ * The parser supports various language constructs such as expressions, statements, functions,
+ * classes, and control flow structures. Each construct is parsed by a separate method, and
+ * these methods call each other recursively to parse nested constructs.
+ *
+ * The parser also includes error handling. If a syntax error is detected, an exception is
+ * thrown and the parser attempts to synchronize with the next valid position in the source
+ * code.
+ */
 #include <stdexcept>
 #include <vector>
 #include "parser.h"
 #include "error.h"
-
-#include <iostream>
 
 Parser::Parser(std::vector<Token> tokens)
 {
@@ -420,9 +437,7 @@ Expr *Parser::Primary()
     if (Match(NIL))
         return new Literal(nullptr);
     if (Match(NUMBER, STRING))
-    {
         return new Literal(Previous().literal);
-    }
     if (Match(SUPER))
     {
         Token keyword = Previous();
@@ -434,9 +449,7 @@ Expr *Parser::Primary()
     if (Match(THIS))
         return new This(Previous());
     if (Match(IDENTIFIER))
-    {
         return new Variable(Previous());
-    }
     if (Match(LEFT_PAREN))
     {
         Expr *expr = ExpressionFun();
@@ -445,7 +458,6 @@ Expr *Parser::Primary()
     }
     throw Error(Peek(), "Expect expression.");
 }
-
 template <typename... Args>
 bool Parser::Match(Args... types)
 {
@@ -461,7 +473,6 @@ bool Parser::Match(Args... types)
     }
     return false;
 }
-
 Token Parser::Consume(TokenType type, std::string message)
 {
     if (Check(type))
@@ -469,41 +480,33 @@ Token Parser::Consume(TokenType type, std::string message)
 
     throw Error(Peek(), message);
 }
-
 Parser::ParseError Parser::Error(Token token, std::string message)
 {
     Error::ReportError(token, message);
     return ParseError();
 }
-
 bool Parser::Check(TokenType type)
 {
     if (IsAtEnd())
         return false;
     return Peek().type == type;
 }
-
 Token Parser::Advance()
 {
     if (!IsAtEnd())
         current++;
     return Previous();
 }
-
 bool Parser::IsAtEnd()
 {
     return Peek().type == END_OF_FILE;
 }
-
 Token Parser::Peek()
 {
     if (static_cast<size_t>(current) >= tokens.size())
-    {
         return Token(END_OF_FILE, "", nullptr, tokens[current - 1].line);
-    }
     return tokens[current];
 }
-
 Token Parser::Previous()
 {
     return tokens[current - 1];

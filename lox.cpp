@@ -1,3 +1,16 @@
+/*
+ * File: lox.cpp
+ * -------------
+ * This file implements the Lox class defined in lox.h. The Lox class is the main entry point for the Lox interpreter.
+ * It provides methods for running a Lox script from a file or from an interactive prompt.
+ *
+ * The RunFile method reads a Lox script from a file and executes it. If an error occurs during execution, the program exits with an error code.
+ *
+ * The RunPrompt method starts an interactive prompt where the user can enter Lox commands, which are executed immediately.
+ *
+ * The Run method is a private helper method that takes a Lox script as a string and executes it. It performs lexical analysis, parsing, resolution, and interpretation.
+ * If an error occurs during any of these stages, it sets the had_error flag and returns immediately.
+ */
 #include <iostream>
 #include <fstream>
 #include <sstream>

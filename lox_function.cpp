@@ -1,3 +1,23 @@
+/*
+ * lox_function.cpp
+ * This file implements the LoxFunction class defined in lox_function.h.
+ * The LoxFunction class represents a user-defined function in the Lox language.
+ *
+ * The constructor initializes the function with a Function declaration, an Environment pointer (representing the lexical environment where the function was defined),
+ * and a boolean indicating whether it is an initializer of a class.
+ *
+ * The destructor deletes the closure environment.
+ *
+ * The Bind method is used for methods to bind the instance to the function's environment.
+ *
+ * The Call method executes the function with the given arguments. It creates a new environment for the function call, defines the function parameters in this environment,
+ * and then executes the function body in this environment. If a return statement is encountered during execution, the function immediately returns the return value.
+ * If the function is an initializer, it returns the instance ("this"). Otherwise, it returns null.
+ *
+ * The Arity method returns the number of parameters the function expects.
+ *
+ * The ToString method returns a string representation of the function.
+ */
 #include "lox_function.h"
 #include "return_method.h"
 #include "interpreter.h"
@@ -30,7 +50,7 @@ Object LoxFunction::Call(Interpreter *interpreter, std::vector<Object> arguments
     {
         if (is_initializer)
             return closure->GetAt(0, "this");
-        return returnValue.value;
+        return returnValue.Get_value();
     }
     if (is_initializer)
         return closure->GetAt(0, "this");

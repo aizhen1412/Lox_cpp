@@ -1,3 +1,9 @@
+/*
+ * parser.h
+ * This file defines the Parser class, which is used to parse the source code and generate an abstract syntax tree (AST).
+ * The Parser class includes methods for parsing different types of statements and expressions, and for handling errors during parsing.
+ * The Parser class also includes a nested ParseError class, which represents an error that occurred during parsing.
+ */
 #ifndef PARSER_H
 #define PARSER_H
 
@@ -11,7 +17,6 @@ class Parser
 public:
     Parser(std::vector<Token> tokens);
     std::vector<Stmt *> Parse();
-
     class ParseError
     {
     };
@@ -20,7 +25,7 @@ private:
     int current = 0;
     std::vector<Token> tokens;
 
-    void Synchronize();
+    void Synchronize(); // if error, skip to the next statement
     Expr *ExpressionFun();
     Stmt *PrintStatement();
     Stmt *VarDeclaration();
@@ -49,13 +54,13 @@ private:
     template <typename... Args>
     bool Match(Args... types);
 
-    Token Consume(TokenType type, std::string message);
+    Token Consume(TokenType type, std::string message); // if not match, throw error
     ParseError Error(Token token, std::string message);
     bool Check(TokenType type);
     Token Advance();
     bool IsAtEnd();
-    Token Peek();
-    Token Previous();
+    Token Peek();     // return the current token
+    Token Previous(); // return the previous token
 };
 
 #endif // PARSER_H

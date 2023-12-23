@@ -1,25 +1,29 @@
+/*
+ * scanner.cpp
+ * This file implements the Scanner class defined in scanner.h.
+ * The Scanner class is used to scan the source code and generate a list of tokens.
+ * It includes methods for scanning individual tokens, checking the next character in the source code, and checking if the end of the source code has been reached.
+ */
+
 #include "scanner.h"
 #include "token_type_functions.h"
 #include "error.h"
 
-Scanner::Scanner(std::string source) : source(source)
-{
-    // 构造函数体为空，因为成员变量已经在初始化列表中初始化
-}
+Scanner::Scanner(std::string source) : source(source) {}
 
-std::vector<Token> Scanner::ScanTokens() // 扫描源代码
+std::vector<Token> Scanner::ScanTokens()
 {
-    while (!IsAtEnd()) // 不是到达末尾
+    while (!IsAtEnd())
     {
         // We are at the beginning of the next lexeme.
-        start = current; // 记录当前词法单元的起始位置
+        start = current;
         ScanToken();
     }
 
     return tokens;
 }
 
-void Scanner::ScanToken() // 扫描词法单元
+void Scanner::ScanToken()
 {
     char c = Advance();
     switch (c)
@@ -69,7 +73,7 @@ void Scanner::ScanToken() // 扫描词法单元
     case '/':
         if (Match('/'))
         {
-            while (Peek() != '\n' && !IsAtEnd()) // 读取注释
+            while (Peek() != '\n' && !IsAtEnd())
                 Advance();
         }
         else
@@ -82,13 +86,13 @@ void Scanner::ScanToken() // 扫描词法单元
     case '\t':
         // Ignore whitespace.
         break;
-    case '\n': // 处理换行符
+    case '\n':
         line++;
         break;
-    case '"': // 处理字符串
+    case '"':
         String();
         break;
-    default: // 处理数字和标识符
+    default:
         if (IsDigit(c))
         {
             Number();
@@ -104,15 +108,19 @@ void Scanner::ScanToken() // 扫描词法单元
         break;
     }
 }
-
-char Scanner::Peek() // 查看下一个字符
+/*
+ * Returns the current character without consuming it.
+ * If the current character index is beyond the end of the source string, it returns a null character.
+ * Otherwise, it returns the current character.
+ */
+char Scanner::Peek()
 {
     if (IsAtEnd())
         return '\0';
-    return source[current]; // 返回当前词法单元的下一个字符
+    return source[current];
 }
 
-char Scanner::PeekNext() // 查看下下一个字符
+char Scanner::PeekNext()
 {
     if (current + 1 >= source.length())
         return '\0';
@@ -125,24 +133,24 @@ char Scanner::Advance()
     return source[current - 1];
 }
 
-void Scanner::AddToken(TokenType type) // 添加词法单元
+void Scanner::AddToken(TokenType type)
 {
     AddToken(type, nullptr);
 }
 
-void Scanner::AddToken(TokenType type, Object literal) // 添加词法单元
+void Scanner::AddToken(TokenType type, Object literal)
 {
-    std::string text = source.substr(start, current - start); // 从源代码中截取出当前词法单元的字符串
-    tokens.push_back(Token(type, text, literal, line));       // 将当前词法单元添加到词法单元列表中
+    std::string text = source.substr(start, current - start);
+    tokens.push_back(Token(type, text, literal, line));
 }
 
 void Scanner::Number()
 {
-    while (IsDigit(Peek())) // 整数
+    while (IsDigit(Peek()))
         Advance();
 
     // Look for a fractional part.
-    if (Peek() == '.' && IsDigit(PeekNext())) // 浮点数
+    if (Peek() == '.' && IsDigit(PeekNext()))
     {
         // Consume the "."
         Advance();
@@ -151,34 +159,32 @@ void Scanner::Number()
             Advance();
     }
 
-    AddToken(NUMBER, std::stod(source.substr(start, current - start))); // 将字符串转换为double类型加入词法单元列表中
+    AddToken(NUMBER, std::stod(source.substr(start, current - start)));
 }
 
-void Scanner::Identifier() // 处理标识符
+void Scanner::Identifier()
 {
     while (IsAlphaNumeric(Peek()))
         Advance();
 
-    std::string text = source.substr(start, current - start); // 截出字符串
+    std::string text = source.substr(start, current - start);
 
-    TokenType type; // 标识符的类型
+    TokenType type;
     auto it = keywords.find(text);
 
     if (it != keywords.end())
     {
         type = it->second;
-        // 处理已找到的情况
     }
     else
     {
         type = TokenType::IDENTIFIER;
-        // 处理未找到的情况默认为IDENTIFIER
     }
 
     AddToken(type);
 }
 
-void Scanner::String() // 处理字符串
+void Scanner::String()
 {
     while (Peek() != '"' && !IsAtEnd())
     {
@@ -201,12 +207,12 @@ void Scanner::String() // 处理字符串
     AddToken(STRING, value);
 }
 
-bool Scanner::IsDigit(char c) // 判断是否为数字
+bool Scanner::IsDigit(char c)
 {
     return c >= '0' && c <= '9';
 }
 
-bool Scanner::Match(const char expected) // 判断当前词法单元是否匹配
+bool Scanner::Match(const char expected)
 {
     if (IsAtEnd())
         return false;
@@ -217,19 +223,19 @@ bool Scanner::Match(const char expected) // 判断当前词法单元是否匹配
     return true;
 }
 
-bool Scanner::IsAlpha(char c) // 判断是否为字母
+bool Scanner::IsAlpha(char c)
 {
     return (c >= 'a' && c <= 'z') ||
            (c >= 'A' && c <= 'Z') ||
            c == '_';
 }
 
-bool Scanner::IsAlphaNumeric(char c) // 判断是否为字母或数字
+bool Scanner::IsAlphaNumeric(char c)
 {
     return IsAlpha(c) || IsDigit(c);
 }
 
-bool Scanner::IsAtEnd() // 判断是否到达末尾
+bool Scanner::IsAtEnd()
 {
     return current >= source.length();
 }

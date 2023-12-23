@@ -1,3 +1,8 @@
+/*
+ * token_type_enum.h
+ * This file defines the TokenType enum, which represents all possible types of lexical tokens in the source code.
+ * The TokenType enum includes single-character tokens, one or two character tokens, literals, keywords, and a special END_OF_FILE token.
+ */
 #ifndef TOKEN_TYPE_ENUM_H
 #define TOKEN_TYPE_ENUM_H
 
