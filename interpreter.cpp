@@ -169,9 +169,9 @@ Object Interpreter::VisitUnaryExpr(Unary &expr)
     // Unreachable.
     return nullptr;
 }
-Object Interpreter::VisitVariableExpr(Variable *expr)
+Object Interpreter::VisitVariableExpr(Variable &expr)
 {
-    return LookUpVariable(expr->name, expr);
+    return LookUpVariable(expr.name, &expr);
 }
 
 Object Interpreter::VisitGroupingExpr(Grouping &expr)

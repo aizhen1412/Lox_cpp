@@ -65,7 +65,7 @@ private:
     Object VisitSetExpr(Set &Expr) override;
     Object VisitThisExpr(This &expr);
     Object VisitUnaryExpr(Unary &expr) override;
-    Object VisitVariableExpr(Variable *expr) override;
+    Object VisitVariableExpr(Variable &expr) override;
     Object VisitGroupingExpr(Grouping &expr) override;
     Object VisitBinaryExpr(Binary &expr) override;
     Object VisitCallExpr(Call &expr);

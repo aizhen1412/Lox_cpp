@@ -259,7 +259,7 @@ public:
   virtual Object VisitSuperExpr(Super &Expr) = 0;
   virtual Object VisitThisExpr(This &Expr) = 0;
   virtual Object VisitUnaryExpr(Unary &Expr) = 0;
-  virtual Object VisitVariableExpr(Variable *Expr) = 0;
+  virtual Object VisitVariableExpr(Variable &Expr) = 0;
 
   virtual Object VisitBlockStmt(Block &stmt) = 0;
   virtual Object VisitClassStmt(Class &stmt) = 0;

@@ -27,9 +27,9 @@ Parser::Parser(std::vector<Token> tokens)
     this->tokens = tokens;
 }
 
-std::vector<Stmt *> Parser::Parse() // 解析表达式
+std::vector<Stmt *> Parser::Parse()
 {
-    std::vector<Stmt *> statements; // 存储语句指针的容器
+    std::vector<Stmt *> statements;
     while (!IsAtEnd())
     {
         statements.push_back(Declaration());
@@ -67,7 +67,6 @@ void Parser::Synchronize()
 Expr *Parser::ExpressionFun()
 {
     return Assignment();
-    //  return Equality(); // 等式
 }
 Stmt *Parser::PrintStatement()
 {
@@ -130,9 +129,7 @@ std::vector<Stmt *> Parser::BlockFun()
     std::vector<Stmt *> statements;
 
     while (!Check(RIGHT_BRACE) && !IsAtEnd())
-    {
         statements.push_back(Declaration());
-    }
 
     Consume(RIGHT_BRACE, "Expect '}' after block.");
 
@@ -159,7 +156,7 @@ Expr *Parser::Assignment()
 
             Error(equals, "Invalid assignment target.");
         }
-    } // return expr;这样是错的，搞了我三天没找到!!!
+    }
     return expr;
 }
 Expr *Parser::Or()
@@ -325,7 +322,7 @@ Expr *Parser::Equality()
 
     while (Match(BANG_EQUAL, EQUAL_EQUAL))
     {
-        Token op = Previous(); // 操作符
+        Token op = Previous();
         Expr *right = Comparison();
         expr = new Binary(expr, op, right);
     }

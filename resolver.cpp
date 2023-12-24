@@ -206,14 +206,14 @@ Object Resolver::VisitUnaryExpr(Unary &expr)
     Resolve(expr.right);
     return nullptr;
 }
-Object Resolver::VisitVariableExpr(Variable *expr)
+Object Resolver::VisitVariableExpr(Variable &expr)
 {
-    if (!scopes.empty() && !scopes.top().empty() && scopes.top().find(expr->name.lexeme) != scopes.top().end() && scopes.top().find(expr->name.lexeme)->second == false)
+    if (!scopes.empty() && !scopes.top().empty() && scopes.top().find(expr.name.lexeme) != scopes.top().end() && scopes.top().find(expr.name.lexeme)->second == false)
     {
-        Error::ReportError(expr->name, "Can't read local variable in its own initializer.");
+        Error::ReportError(expr.name, "Can't read local variable in its own initializer.");
     }
 
-    ResolveLocal(expr, expr->name);
+    ResolveLocal(&expr, expr.name);
     return nullptr;
 }
 

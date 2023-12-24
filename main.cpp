@@ -11,6 +11,7 @@
 #include "token.h"
 #include "scanner.h"
 #include "lox.h"
+#include "ast_printer.h"
 
 int main(int argc, char const *argv[])
 {

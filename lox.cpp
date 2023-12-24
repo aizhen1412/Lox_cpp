@@ -58,10 +58,10 @@ void Lox::RunPrompt()
     }
 }
 
-void Lox::Run(const std::string &source) // 运行源代码
+void Lox::Run(const std::string &source)
 {
-    Scanner scanner(source);                          // 词法分析
-    std::vector<Token> tokens = scanner.ScanTokens(); // 存储词法单元
+    Scanner scanner(source);
+    std::vector<Token> tokens = scanner.ScanTokens();
 
     Parser parser(tokens);
     std::vector<Stmt *> statements = parser.Parse();
@@ -77,6 +77,11 @@ void Lox::Run(const std::string &source) // 运行源代码
 
     if (had_error)
         return;
+
+    // print ast
+    // AstPrinter printer = AstPrinter();
+    // for (auto statement : statements)
+    //     printer.print(statement);
 
     interpreter.Interpret(statements);
 

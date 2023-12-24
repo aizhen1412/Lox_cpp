@@ -1,30 +1,9 @@
-class A {
-  method() {
-    print "A method";
-  }
+var n = 5;
+while (n > 0) {
+    print(n);
+    n = n - 1;
 }
 
-class B < A {
-  method() {
-    print "B method";
-  }
-  function() {
-    this.method();
-  }
-
-  test() {
-    super.method();
-  }
+for (var i = 0; i < 5; i= i+1) {
+    print(i);
 }
-
-class C < B {}
-
-C().test();
-B().function();
-fun fib(n)
-{
-    if (n < 2)
-        return n;
-    return fib(n - 1) + fib(n - 2);
-}
-print fib(10);

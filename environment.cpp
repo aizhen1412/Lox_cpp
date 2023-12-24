@@ -37,7 +37,7 @@ Environment::Environment(Environment *enclosing)
 }
 Environment::~Environment()
 {
-    delete enclosing;
+    // delete enclosing; //may cause double free
     for (auto it = values.begin(); it != values.end(); it++)
     {
         std::visit([](auto &&arg)

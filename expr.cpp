@@ -48,7 +48,7 @@ Unary::Unary(Token op, Expr *right) : op(op), right(right) {}
 Object Unary::Accept(Visitor &visitor) { return visitor.VisitUnaryExpr(*this); }
 
 Variable::Variable(Token name) : name(name) {}
-Object Variable::Accept(Visitor &visitor) { return visitor.VisitVariableExpr(this); }
+Object Variable::Accept(Visitor &visitor) { return visitor.VisitVariableExpr(*this); }
 
 Block::Block(std::vector<Stmt *> statements) : statements(statements) {}
 Object Block::Accept(Visitor &visitor) { return visitor.VisitBlockStmt(*this); }

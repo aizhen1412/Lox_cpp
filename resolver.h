@@ -62,7 +62,7 @@ private:
     Object VisitSuperExpr(Super &expr) override;
     Object VisitThisExpr(This &expr) override;
     Object VisitUnaryExpr(Unary &expr) override;
-    Object VisitVariableExpr(Variable *expr) override;
+    Object VisitVariableExpr(Variable &expr) override;
 
     void Resolve(Stmt *stmt);
     void Resolve(Expr *expr);
