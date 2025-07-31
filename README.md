@@ -6,10 +6,6 @@ Lox解释器的C++实现 (C++ implementation of Lox)
 
 这是一个个人项目，旨在实现Lox解释器的C++版本。Lox是一门小型的脚本语言，用于解释器和编译器的教学和学习。
 
-## 使用的C++版本
-
-这个项目使用C++11标准来编写。
-
 ## 关于 Lox 语言
 
 Lox是一门简单但功能齐全的编程语言，用于教育目的。它是由Robert Nystrom定义，在他的书《Crafting Interpreters》中。
